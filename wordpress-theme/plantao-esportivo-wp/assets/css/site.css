@@ -24,7 +24,10 @@ body.pew-site img{max-width:100%;height:auto}
 .pew-search button{background:var(--pew-blue);color:#fff!important;border:0;font-weight:700;padding:10px 15px;cursor:pointer}
 .pew-search button:hover{background:#142d70}
 .pew-menu-toggle{display:none;background:var(--pew-blue);color:white;border:0;border-radius:6px;padding:9px 13px;cursor:pointer}
-.pew-nav{background:var(--pew-blue);color:#fff}
+.pew-nav{background:var(--pew-blue);color:#fff;position:sticky;top:0;z-index:1100;box-shadow:0 3px 10px rgba(15,23,42,.14)}
+/* Keep the fixed WordPress administrator bar above the navigation. */
+body.admin-bar .pew-nav{top:32px}
+@media(max-width:782px){body.admin-bar .pew-nav{top:46px}}
 .pew-nav-list{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:0}
 .pew-nav-list>li{position:relative;list-style:none;margin:0}
 .pew-nav-list a{color:#fff!important;display:block;padding:15px 17px;font:800 17px/1.2 'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.04em}
@@ -144,7 +147,10 @@ body.pew-site img{max-width:100%;height:auto}
  .pew-brand-link{font-size:29px}
  .pew-header-search{order:3;width:100%}
  .pew-menu-toggle{display:block}
- .pew-nav{display:none}
+ /* On phones the compact header stays reachable; the expanded menu is a dropdown. */
+ .pew-header{position:sticky;top:0;z-index:1200;box-shadow:0 2px 8px rgba(15,23,42,.10)}
+ body.admin-bar .pew-header{top:46px}
+ .pew-nav{display:none;position:fixed;top:var(--pew-mobile-menu-top,120px);left:0;right:0;z-index:1199;max-height:calc(100vh - var(--pew-mobile-menu-top,120px));max-height:calc(100dvh - var(--pew-mobile-menu-top,120px));overflow-y:auto;box-shadow:0 10px 20px rgba(15,23,42,.20)}
  .pew-nav.is-open{display:block}
  .pew-nav-list{display:block;padding:5px 0}
  .pew-nav-list li{width:100%}
@@ -228,3 +234,6 @@ body.pew-site img{max-width:100%;height:auto}
  .pew-newsletter-inner h2{font-size:28px}
  .pew-home-newsletter{background:#1e3a8a}
 }
+
+/* The mobile WordPress admin bar is not fixed on narrow screens. */
+@media(max-width:600px){body.admin-bar .pew-header{top:0}}
