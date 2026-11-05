@@ -128,6 +128,15 @@ function pew_register_sidebars() {
         'after_title' => '</h3>',
     ));
     register_sidebar(array(
+        'name' => __('Widgets extras da página inicial', 'plantao-esportivo-wp'),
+        'id' => 'home-sidebar',
+        'description' => __('Widgets opcionais exibidos abaixo dos blocos editoriais da página inicial.', 'plantao-esportivo-wp'),
+        'before_widget' => '<section id="%1$s" class="pew-widget %2$s">',
+        'after_widget' => '</section>',
+        'before_title' => '<h3 class="pew-widget-title">',
+        'after_title' => '</h3>',
+    ));
+    register_sidebar(array(
         'name' => __('Newsletter do rodapé', 'plantao-esportivo-wp'),
         'id' => 'newsletter',
         'description' => __('Insira aqui o formulário do serviço de newsletter que você configurar.', 'plantao-esportivo-wp'),
