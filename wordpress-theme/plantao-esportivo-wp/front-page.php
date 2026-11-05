@@ -196,7 +196,7 @@ $pew_sections = array(
                     <?php endforeach; ?>
                 </ul>
             </section>
-            <?php if (is_active_sidebar('noticias-sidebar')) : dynamic_sidebar('noticias-sidebar'); endif; ?>
+            <?php if (is_active_sidebar('home-sidebar')) : dynamic_sidebar('home-sidebar'); endif; ?>
         </aside>
     </div>
 
