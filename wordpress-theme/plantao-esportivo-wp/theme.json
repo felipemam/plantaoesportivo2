@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "color": {
+      "custom": true,
+      "palette": [
+        {
+          "slug": "azul",
+          "name": "Azul Plantão",
+          "color": "#1e3a8a"
+        },
+        {
+          "slug": "vermelho",
+          "name": "Vermelho",
+          "color": "#dc2626"
+        },
+        {
+          "slug": "amarelo",
+          "name": "Amarelo",
+          "color": "#facc15"
+        },
+        {
+          "slug": "escuro",
+          "name": "Escuro",
+          "color": "#111827"
+        }
+      ]
+    },
+    "layout": {
+      "contentSize": "760px",
+      "wideSize": "1240px"
+    }
+  },
+  "styles": {
+    "color": {
+      "text": "#111827",
+      "background": "#f8fafc"
+    }
+  }
+}
