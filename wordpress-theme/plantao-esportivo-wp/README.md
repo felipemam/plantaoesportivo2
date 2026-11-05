@@ -53,3 +53,25 @@ O tema está em subdiretório. Clonar o repositório React inteiro em wp-content
 - Compatibilidade com plugins atuais, inclusive Elementor
 - Revisão de SEO/acessibilidade/segurança, comentários, menus, imagens e formulários
 - Configurar newsletter e dados institucionais reais; não publicar informações fictícias.
+
+
+## Página inicial sempre visível (revisão 0.1)
+
+A capa contém barra de editorias, destaques, cards de últimas notícias, blocos por categoria,
+barra lateral editorial, vídeos e chamada para acompanhar novidades. Se o WordPress ainda
+não tiver posts, o tema exibirá **marcadores visuais identificados como conteúdo em preparação**,
+não notícias, placares ou entrevistas fictícios. Cada seção passa a usar as publicações reais
+à medida que elas são criadas.
+
+O tema usa `front-page.php` automaticamente na página principal do site. **Não é preciso
+criar uma página chamada "Home" para habilitar a capa**, mas escolha uma página de posts
+em Configurações > Leitura se quiser um arquivo próprio de todas as notícias.
+
+Os slugs de categorias listados na documentação devem coincidir com os criados no
+WordPress. Vídeos são posts da categoria opcional `videos`, sem reprodução automática.
+
+Para receber esta revisão no Git Installer, atualize o repositório/branch
+`feat/wordpress-editorial-theme` e confirme que o subdiretório instalado é
+`wordpress-theme/plantao-esportivo-wp`. Teste no staging antes de atualizar
+o site público. O GitHub e o servidor não sincronizam automaticamente sem
+uma atualização feita pelo plugin.
