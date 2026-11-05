@@ -19,7 +19,7 @@ $featured = pew_featured_posts(4);
                             <div class="pew-hero-image"><?php pew_thumbnail('pew-hero'); ?></div>
                             <div class="pew-hero-shade"></div>
                             <div class="pew-hero-copy">
-                                <?php pew_post_category(); ?>
+                                <?php $hero_cats = get_the_category(); if (!empty($hero_cats)) : ?><span class="pew-category"><?php echo esc_html($hero_cats[0]->name); ?></span><?php endif; ?>
                                 <h2><?php the_title(); ?></h2>
                                 <p><?php pew_summary(26); ?></p>
                                 <span class="pew-meta">Por <?php the_author(); ?> · <?php echo esc_html(get_the_date()); ?></span>
@@ -61,7 +61,7 @@ $featured = pew_featured_posts(4);
     <section class="pew-section pew-container" aria-labelledby="pew-latest-title">
         <div class="pew-section-heading">
             <div><span class="pew-red-dot"></span><h2 id="pew-latest-title">Últimas Notícias</h2><p>Publicadas pela redação</p></div>
-            <a class="pew-section-link" href="<?php echo esc_url(get_post_type_archive_link('post') ?: home_url('/')); ?>">Ver todas →</a>
+            <?php $posts_page_id = (int) get_option('page_for_posts'); if ($posts_page_id) : ?><a class="pew-section-link" href="<?php echo esc_url(get_permalink($posts_page_id)); ?>">Ver todas →</a><?php endif; ?>
         </div>
         <div class="pew-card-grid">
             <?php while ($latest->have_posts()) : $latest->the_post(); get_template_part('template-parts/card', 'news'); endwhile; ?>
