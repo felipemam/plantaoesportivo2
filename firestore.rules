@@ -1,0 +1,243 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net (Default-Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 1. Hardened Global Primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function hasValidParentUser(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId))
+        && get(/databases/$(database)/documents/users/$(userId)).data.uid == request.auth.uid;
+    }
+
+    // 2. Entity Validation Blueprints (Anti-Update-Gap)
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'displayName', 'photoURL', 'createdAt', 'updatedAt'])
+        && data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128 && data.uid.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.uid == request.auth.uid
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100
+        && (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 500))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidBookmark(data) {
+      return data.keys().hasAll(['userId', 'articleId', 'articleTitle', 'category', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['userId', 'articleId', 'articleTitle', 'category', 'driveFileId', 'createdAt', 'updatedAt'])
+        && data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.userId == request.auth.uid
+        && data.articleId is string && data.articleId.size() >= 1 && data.articleId.size() <= 128 && data.articleId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.articleTitle is string && data.articleTitle.size() >= 1 && data.articleTitle.size() <= 200
+        && data.category is string && data.category.size() >= 1 && data.category.size() <= 60
+        && (!('driveFileId' in data) || (data.driveFileId is string && data.driveFileId.size() >= 1 && data.driveFileId.size() <= 128 && data.driveFileId.matches('^[a-zA-Z0-9_\\-]+$')))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidComment(data) {
+      return data.keys().hasAll(['articleId', 'authorId', 'authorName', 'authorAvatar', 'text', 'likes', 'status', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['articleId', 'authorId', 'authorName', 'authorAvatar', 'text', 'likes', 'status', 'createdAt', 'updatedAt'])
+        && data.articleId is string && data.articleId.size() >= 1 && data.articleId.size() <= 128 && data.articleId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.authorId is string && data.authorId.size() >= 1 && data.authorId.size() <= 128 && data.authorId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.authorId == request.auth.uid
+        && data.authorName is string && data.authorName.size() >= 1 && data.authorName.size() <= 80
+        && data.authorAvatar is string && data.authorAvatar.size() >= 1 && data.authorAvatar.size() <= 10
+        && data.text is string && data.text.size() >= 1 && data.text.size() <= 1000
+        && data.likes is int && data.likes >= 0 && data.likes <= 1000000
+        && data.status is string && data.status.size() <= 20 && (data.status == 'published' || data.status == 'archived')
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidDriveExport(data) {
+      return data.keys().hasAll(['ownerId', 'driveFileId', 'fileName', 'mimeType', 'articleId', 'status', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['ownerId', 'driveFileId', 'fileName', 'mimeType', 'articleId', 'status', 'createdAt', 'updatedAt'])
+        && data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.ownerId == request.auth.uid
+        && data.driveFileId is string && data.driveFileId.size() >= 1 && data.driveFileId.size() <= 128 && data.driveFileId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.fileName is string && data.fileName.size() >= 1 && data.fileName.size() <= 200
+        && data.mimeType is string && data.mimeType.size() >= 1 && data.mimeType.size() <= 100
+        && data.articleId is string && data.articleId.size() >= 1 && data.articleId.size() <= 128 && data.articleId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.status is string && data.status.size() <= 20 && (data.status == 'synced' || data.status == 'deleted')
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // 3. Collection Rules
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && existing().uid == request.auth.uid;
+      allow list: if false;
+
+      allow create: if isVerifiedUser()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && isValidUserProfile(incoming())
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow update: if isVerifiedUser()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && isValidUserProfile(incoming())
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          // Action: UpdateProfile
+          incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'updatedAt'])
+        );
+
+      allow delete: if false;
+
+      // Subcollection: Bookmarks (Master Gate enforced)
+      match /bookmarks/{bookmarkId} {
+        allow get: if isSignedIn()
+          && isValidId(userId)
+          && isValidId(bookmarkId)
+          && request.auth.uid == userId
+          && existing().userId == request.auth.uid
+          && hasValidParentUser(userId);
+
+        allow list: if isSignedIn()
+          && request.auth.uid == userId
+          && resource.data.userId == request.auth.uid;
+
+        allow create: if isVerifiedUser()
+          && isValidId(userId)
+          && isValidId(bookmarkId)
+          && request.auth.uid == userId
+          && isValidBookmark(incoming())
+          && incoming().userId == userId
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && hasValidParentUser(userId);
+
+        allow update: if isVerifiedUser()
+          && isValidId(userId)
+          && isValidId(bookmarkId)
+          && request.auth.uid == userId
+          && isValidBookmark(incoming())
+          && existing().userId == request.auth.uid
+          && incoming().userId == existing().userId
+          && incoming().articleId == existing().articleId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && (
+            // Action: LinkDriveFile
+            incoming().diff(existing()).affectedKeys().hasOnly(['driveFileId', 'updatedAt'])
+          )
+          && hasValidParentUser(userId);
+
+        allow delete: if isVerifiedUser()
+          && isValidId(userId)
+          && isValidId(bookmarkId)
+          && request.auth.uid == userId
+          && existing().userId == request.auth.uid
+          && hasValidParentUser(userId);
+      }
+    }
+
+    match /comments/{commentId} {
+      allow get: if isSignedIn()
+        && isValidId(commentId)
+        && (existing().authorId == request.auth.uid || existing().status == 'published');
+
+      allow list: if isSignedIn()
+        && (resource.data.authorId == request.auth.uid || resource.data.status == 'published');
+
+      allow create: if isVerifiedUser()
+        && isValidId(commentId)
+        && isValidComment(incoming())
+        && incoming().status == 'published'
+        && incoming().likes == 0
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && hasValidParentUser(incoming().authorId);
+
+      allow update: if isVerifiedUser()
+        && isValidId(commentId)
+        && isValidComment(incoming())
+        && existing().authorId == request.auth.uid
+        && incoming().authorId == existing().authorId
+        && incoming().articleId == existing().articleId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && existing().status != 'archived'
+        && (
+          // Action: EditCommentText
+          (incoming().status == existing().status && incoming().likes == existing().likes && incoming().diff(existing()).affectedKeys().hasOnly(['text', 'updatedAt'])) ||
+          // Action: ArchiveComment (Terminal State transition)
+          (incoming().status == 'archived' && incoming().text == existing().text && incoming().likes == existing().likes && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']))
+        )
+        && hasValidParentUser(existing().authorId);
+
+      allow delete: if isVerifiedUser()
+        && isValidId(commentId)
+        && existing().authorId == request.auth.uid
+        && hasValidParentUser(existing().authorId);
+    }
+
+    match /driveExports/{exportId} {
+      allow get: if isSignedIn()
+        && isValidId(exportId)
+        && existing().ownerId == request.auth.uid;
+
+      allow list: if isSignedIn()
+        && resource.data.ownerId == request.auth.uid;
+
+      allow create: if isVerifiedUser()
+        && isValidId(exportId)
+        && isValidDriveExport(incoming())
+        && incoming().status == 'synced'
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && hasValidParentUser(incoming().ownerId);
+
+      allow update: if isVerifiedUser()
+        && isValidId(exportId)
+        && isValidDriveExport(incoming())
+        && existing().ownerId == request.auth.uid
+        && incoming().ownerId == existing().ownerId
+        && incoming().articleId == existing().articleId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && existing().status != 'deleted'
+        && (
+          // Action: RenameOrResyncDriveFile
+          (incoming().status == 'synced' && incoming().diff(existing()).affectedKeys().hasOnly(['fileName', 'driveFileId', 'updatedAt'])) ||
+          // Action: MarkDriveExportDeleted (Terminal State transition)
+          (incoming().status == 'deleted' && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']))
+        )
+        && hasValidParentUser(existing().ownerId);
+
+      allow delete: if isVerifiedUser()
+        && isValidId(exportId)
+        && existing().ownerId == request.auth.uid
+        && hasValidParentUser(existing().ownerId);
+    }
+  }
+}

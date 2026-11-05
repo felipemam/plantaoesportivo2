@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --primary: #1e3a8a;
+    --secondary: #dc2626;
+    --highlight: #facc15;
+    --font-title: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+    --font-serif: 'Source Serif 4', Georgia, serif;
+    --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    font-family: var(--font-ui);
+    color: #111827;
+    background-color: #f8f9fb;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.font-condensed {
+  font-family: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+}
+
+.font-serif-body {
+  font-family: 'Source Serif 4', Georgia, serif;
+}
+
+.drop-cap::first-letter {
+  float: left;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 5rem;
+  line-height: 0.8;
+  padding-right: 0.65rem;
+  padding-top: 0.25rem;
+  color: #dc2626;
+}
+
+@keyframes livePulse {
+  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #dc2626;
+  animation: livePulse 1.5s infinite;
+}
+
+/* Custom scrollbars for ticker */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Official Sign in with Google Material Button */
+.gsi-material-button {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-appearance: none;
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #747775;
+  -webkit-border-radius: 20px;
+  border-radius: 20px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  color: #1f1f1f;
+  cursor: pointer;
+  font-family: 'Inter', 'Roboto', arial, sans-serif;
+  font-size: 13px;
+  height: 36px;
+  letter-spacing: 0.25px;
+  outline: none;
+  overflow: hidden;
+  padding: 0 12px;
+  position: relative;
+  text-align: center;
+  -webkit-transition: background-color .218s, border-color .218s, box-shadow .218s;
+  transition: background-color .218s, border-color .218s, box-shadow .218s;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: auto;
+  max-width: 400px;
+  min-width: min-content;
+}
+
+.gsi-material-button .gsi-material-button-icon {
+  height: 18px;
+  margin-right: 10px;
+  min-width: 18px;
+  width: 18px;
+}
+
+.gsi-material-button .gsi-material-button-content-wrapper {
+  -webkit-align-items: center;
+  align-items: center;
+  display: flex;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  height: 100%;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+}
+
+.gsi-material-button .gsi-material-button-contents {
+  -webkit-flex-grow: 1;
+  flex-grow: 1;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+
+.gsi-material-button .gsi-material-button-state {
+  -webkit-transition: opacity .218s;
+  transition: opacity .218s;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.gsi-material-button:disabled {
+  cursor: default;
+  background-color: #ffffff61;
+  border-color: #1f1f1f1f;
+}
+
+.gsi-material-button:not(:disabled):hover {
+  -webkit-box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+}
+
+.gsi-material-button:not(:disabled):hover .gsi-material-button-state {
+  background-color: #303030;
+  opacity: 8%;
+}
+

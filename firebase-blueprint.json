@@ -1,0 +1,225 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Public profile metadata for an authenticated Plantão Esportivo reader (PII isolated).",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the user.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the reader.",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Optional avatar URL.",
+          "minLength": 0,
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": ["uid", "displayName", "createdAt", "updatedAt"]
+    },
+    "Bookmark": {
+      "title": "Bookmark",
+      "description": "Saved article bookmark belonging to a user profile.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "articleId": {
+          "type": "string",
+          "description": "Slug ID of the saved article.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "articleTitle": {
+          "type": "string",
+          "description": "Headline of the saved article.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "category": {
+          "type": "string",
+          "description": "Editorial category of the article.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "driveFileId": {
+          "type": "string",
+          "description": "Optional Google Drive file ID if exported to Drive.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": ["userId", "articleId", "articleTitle", "category", "createdAt", "updatedAt"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "Reader comment posted on an article.",
+      "type": "object",
+      "properties": {
+        "articleId": {
+          "type": "string",
+          "description": "Target article slug ID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "authorId": {
+          "type": "string",
+          "description": "UID of the comment author.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "authorName": {
+          "type": "string",
+          "description": "Display name of the comment author.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "authorAvatar": {
+          "type": "string",
+          "description": "Initials avatar of the comment author.",
+          "minLength": 1,
+          "maxLength": 10
+        },
+        "text": {
+          "type": "string",
+          "description": "Body of the comment.",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "likes": {
+          "type": "integer",
+          "description": "Number of likes on the comment."
+        },
+        "status": {
+          "type": "string",
+          "description": "Moderation state of the comment.",
+          "enum": ["published", "archived"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": ["articleId", "authorId", "authorName", "authorAvatar", "text", "likes", "status", "createdAt", "updatedAt"]
+    },
+    "DriveExport": {
+      "title": "DriveExport",
+      "description": "Metadata record of an article or reading list exported to Google Drive.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the user who exported the file.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "driveFileId": {
+          "type": "string",
+          "description": "Google Drive file ID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "fileName": {
+          "type": "string",
+          "description": "Name of the exported file in Google Drive.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "MIME type of the Google Drive file.",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "articleId": {
+          "type": "string",
+          "description": "Associated article ID or 'reading-list'.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "status": {
+          "type": "string",
+          "description": "Sync status of the Drive export.",
+          "enum": ["synced", "deleted"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": ["ownerId", "driveFileId", "fileName", "mimeType", "articleId", "status", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profile document owned by userId."
+    },
+    "/users/{userId}/bookmarks/{bookmarkId}": {
+      "schema": { "$ref": "#/entities/Bookmark" },
+      "description": "Subcollection of saved article bookmarks for a user."
+    },
+    "/comments/{commentId}": {
+      "schema": { "$ref": "#/entities/Comment" },
+      "description": "Article comments collection."
+    },
+    "/driveExports/{exportId}": {
+      "schema": { "$ref": "#/entities/DriveExport" },
+      "description": "Records of articles exported to the user's Google Drive."
+    }
+  }
+}

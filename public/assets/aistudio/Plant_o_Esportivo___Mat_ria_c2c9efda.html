@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plantão Esportivo — Matéria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Skip artifact shell — fixed styles served beside every artifact.
+   Tokens, utilities and components (basecoat 1.0 markup, no CDN); artifacts
+   override --accent for their own identity. */
+:root {
+  color-scheme: light dark;
+  --accent: #2563eb;
+  --accent-contrast: #ffffff;
+  --accent-text: color-mix(in srgb, var(--accent) 72%, #000);
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --text: #14171f;
+  --text-muted: #5b6472;
+  --border: rgba(20, 23, 31, 0.10);
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(20, 23, 31, 0.08);
+  --space: 16px;
+  --success: #0a7a35;
+  --danger: #c0262d;
+  --warning: #8a5300;
+}
+/* Theme resolution. Without data-theme the viewer's system preference decides,
+   as it always did. With it, the artifact's own choice wins in BOTH directions:
+   a page that hardcodes one palette must not be handed the opposite set of
+   tokens by the machine it happens to be opened on. The dark values appear
+   twice because a media query cannot be folded into a selector list.
+   The attribute sits inside :where() so these blocks keep the specificity of a
+   bare :root — the page's own <style> is linked after this file and must go on
+   overriding any token it wants, exactly as it could before. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+    --bg: #101318;
+    --surface: #181c23;
+    --text: #eef1f6;
+    --text-muted: #9aa4b2;
+    --border: rgba(238, 241, 246, 0.12);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --success: #4ade80;
+    --danger: #f87171;
+    --warning: #fbbf24;
+  }
+}
+:root:where([data-theme="dark"]) {
+  color-scheme: dark;
+  --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+  --bg: #101318;
+  --surface: #181c23;
+  --text: #eef1f6;
+  --text-muted: #9aa4b2;
+  --border: rgba(238, 241, 246, 0.12);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --success: #4ade80;
+  --danger: #f87171;
+  --warning: #fbbf24;
+}
+:root:where([data-theme="light"]) { color-scheme: light; }
+/* Pages generated before the shell had its own components still link the
+   basecoat CDN, which reads its own tokens and switches theme only on a
+   .dark class. Bridged to the shell's, whatever of it those pages use takes
+   the page's accent and follows the declared theme. Its --accent token is a
+   hover tint, renamed in its theme as --color-accent; the shell's --accent is
+   the brand colour, so the tint is derived from it here. */
+:root {
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-contrast);
+  --secondary: color-mix(in srgb, var(--text) 7%, var(--surface));
+  --secondary-foreground: var(--text);
+  --muted: color-mix(in srgb, var(--text) 5%, var(--surface));
+  --muted-foreground: var(--text-muted);
+  --color-accent: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --color-accent-foreground: var(--text);
+  --destructive: var(--danger);
+  --input: var(--border);
+  --ring: var(--accent);
+}
+* { box-sizing: border-box; }
+/* The reset the pages were written against: they all linked basecoat, which
+   ships Tailwind's. Its components now live here, so the reset does too. */
+*, ::before, ::after, ::backdrop { margin: 0; padding: 0; border: 0 solid; }
+/* Preflight's rule too: without it a component class that sets display
+   (.alert, .card, .btn…) beats the hidden attribute and shows the element. */
+[hidden]:where(:not([hidden="until-found"])) { display: none !important; }
+.hidden { display: none !important; }
+h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+a { color: inherit; text-decoration: inherit; }
+b, strong { font-weight: bolder; }
+ol, ul, menu { list-style: none; }
+svg, video, canvas, iframe { display: block; vertical-align: middle; }
+button, input, select, textarea { color: inherit; background-color: transparent; border-radius: 0; }
+table { border-collapse: collapse; }
+hr { height: 0; color: inherit; border-top-width: 1px; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+
+.shell-container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.shell-section { padding: calc(var(--space) * 2) 0; }
+.shell-grid { display: grid; gap: var(--space); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.shell-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: var(--space); }
+.shell-footer { padding: 24px 0 40px; color: var(--text-muted); font-size: 13px; }
+
+.shell-hero { padding: calc(var(--space) * 3) 0 calc(var(--space) * 2); }
+.shell-hero h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+.shell-hero p { color: var(--text-muted); max-width: 60ch; margin: 0; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space);
+}
+
+.kpi { display: flex; flex-direction: column; gap: 4px; }
+.kpi .kpi-value { font-size: clamp(22px, 2.3vw, 28px); font-weight: 650; line-height: 1.1; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.kpi .kpi-label { font-size: 13px; color: var(--text-muted); }
+.kpi .kpi-delta { font-size: 12.5px; font-weight: 600; }
+.kpi .kpi-delta.up { color: var(--success); }
+.kpi .kpi-delta.down { color: var(--danger); }
+
+table.shell-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.shell-table th {
+  text-align: left; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 600;
+}
+table.shell-table th, table.shell-table td { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--border); }
+table.shell-table td.num, table.shell-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+.chart-box { width: 100%; min-height: 220px; }
+.chart-box svg { width: 100%; height: auto; display: block; }
+.chart-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; margin-top: 12px; font-size: 12.5px; color: var(--text-muted); }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.chart-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.chart-legend b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.muted { color: var(--text-muted); }
+.accent { color: var(--accent-text); }
+.shell-badge, .eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-text);
+}
+/* A pill keeps its content width inside flex and grid columns, which would
+   otherwise stretch it across the card; a centred parent still centres it. */
+.shell-badge, .eyebrow, .badge { width: fit-content; max-width: 100%; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .shell-fade { animation: shell-fade 400ms ease both; }
+  @keyframes shell-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+
+/* Layout and type utilities: what the pages kept spelling in style="".
+   Spacing and type sizes follow Tailwind's scale; there is no Tailwind. */
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.stack { display: flex; flex-direction: column; gap: var(--space); }
+.between { justify-content: space-between; }
+.grow { flex: 1 1 0; min-width: 0; }
+.cols-2, .cols-3, .cols-4, .cols-5 { display: grid; gap: var(--space); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 720px) {
+  .cols-2, .cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1000px) { .cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.gap-1 { gap: 4px; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; } .gap-6 { gap: 24px; }
+.m-0 { margin: 0; }
+.mt-1 { margin-top: 4px; } .mt-2 { margin-top: 8px; } .mt-3 { margin-top: 12px; } .mt-4 { margin-top: 16px; } .mt-6 { margin-top: 24px; }
+.mb-1 { margin-bottom: 4px; } .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mb-4 { margin-bottom: 16px; } .mb-6 { margin-bottom: 24px; }
+.p-2 { padding: 8px; } .p-3 { padding: 12px; } .p-4 { padding: 16px; } .p-6 { padding: 24px; }
+.text-xs { font-size: 12px; } .text-sm { font-size: 14px; } .text-base { font-size: 16px; }
+.text-lg { font-size: 18px; } .text-xl { font-size: 20px; line-height: 1.35; }
+.text-2xl { font-size: 24px; line-height: 1.25; } .text-3xl { font-size: 30px; line-height: 1.2; }
+.font-medium { font-weight: 500; } .font-semibold { font-weight: 600; } .font-bold { font-weight: 700; }
+.text-right { text-align: right; } .text-center { text-align: center; }
+.nowrap { white-space: nowrap; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+.w-full { width: 100%; }
+.text-success { color: var(--success); } .text-danger { color: var(--danger); } .text-warning { color: var(--warning); }
+
+/* Components, with basecoat 1.0 markup (variants and sizes are data
+   attributes) and the shell tokens, so a page needs neither component CSS
+   nor a CSS framework. An older page that also links basecoat gets these
+   rules after it, over the same properties. */
+button, input, select, textarea { font: inherit; }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 0 14px; border: 1px solid transparent; border-radius: calc(var(--radius) - 2px);
+  background: var(--accent); color: var(--accent-contrast);
+  font-size: 14px; font-weight: 500; line-height: 1; white-space: nowrap; text-decoration: none; cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.btn:hover { background: color-mix(in srgb, var(--accent) 86%, #000); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+.btn[data-variant="secondary"] { background: color-mix(in srgb, var(--text) 8%, var(--surface)); color: var(--text); }
+.btn[data-variant="secondary"]:hover { background: color-mix(in srgb, var(--text) 14%, var(--surface)); }
+.btn[data-variant="outline"] { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn[data-variant="ghost"] { background: transparent; color: var(--text); }
+.btn[data-variant="outline"]:hover, .btn[data-variant="ghost"]:hover { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.btn[data-variant="destructive"] { background: var(--danger); color: var(--bg); }
+.btn[data-variant="destructive"]:hover { background: color-mix(in srgb, var(--danger) 86%, var(--text)); }
+.btn[data-variant="link"] { height: auto; padding: 0; background: none; color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; }
+.btn[data-size="sm"] { height: 30px; padding: 0 10px; font-size: 13px; }
+.btn[data-size="lg"] { height: 42px; padding: 0 20px; font-size: 15px; }
+.btn[data-size="icon"] { width: 36px; padding: 0; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+  border: 1px solid transparent; border-radius: 999px; background: var(--accent); color: var(--accent-contrast);
+  font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap;
+}
+.badge[data-variant="secondary"] { background: color-mix(in srgb, var(--text) 8%, var(--surface)); color: var(--text); }
+.badge[data-variant="outline"] { background: transparent; color: var(--text); border-color: var(--border); }
+.badge[data-variant="destructive"] { background: color-mix(in srgb, var(--danger) 14%, var(--surface)); color: var(--danger); }
+
+.alert {
+  display: grid; gap: 4px; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); font-size: 14px;
+}
+.alert h2, .alert h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.alert p, .alert section { margin: 0; color: var(--text-muted); }
+.alert[data-variant="destructive"] { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); background: color-mix(in srgb, var(--danger) 7%, var(--surface)); color: var(--danger); }
+
+.card {
+  display: flex; flex-direction: column; gap: 16px; padding: 20px 0;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 2px);
+  background: var(--surface); color: var(--text); box-shadow: var(--shadow);
+}
+.card > header, .card > section, .card > footer { padding: 0 20px; }
+.card > header { display: grid; gap: 4px; }
+.card > header h2, .card > header h3 { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.3; }
+.card > header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+.card > footer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.input {
+  width: 100%; min-height: 36px; padding: 6px 12px; border: 1px solid var(--border); border-radius: calc(var(--radius) - 2px);
+  background: var(--surface); color: var(--text); font-size: 14px;
+}
+textarea.input { min-height: 84px; resize: vertical; }
+.input::placeholder { color: var(--text-muted); }
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 14px; font-weight: 500; }
+.field [role="alert"] { color: var(--danger); font-size: 13px; }
+
+dialog.dialog {
+  width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px); margin: auto; padding: 0;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 4px);
+  background: var(--surface); color: var(--text); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+dialog.dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+dialog.dialog > div { display: grid; gap: 16px; padding: 24px; }
+dialog.dialog header { display: grid; gap: 4px; }
+dialog.dialog header h2 { margin: 0; font-size: 18px; font-weight: 600; }
+dialog.dialog header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+dialog.dialog footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+
+.tabs { display: grid; gap: 12px; }
+.tabs > [role="tablist"] {
+  display: inline-flex; gap: 4px; width: fit-content; max-width: 100%; padding: 4px; overflow-x: auto;
+  border-radius: var(--radius); background: color-mix(in srgb, var(--text) 6%, var(--surface));
+}
+.tabs [role="tab"] {
+  padding: 6px 12px; border: 0; border-radius: calc(var(--radius) - 4px); background: transparent;
+  color: var(--text-muted); font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer;
+}
+.tabs [role="tab"][aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.tabs [role="tabpanel"][hidden] { display: none; }
+
+.accordion > details { border-bottom: 1px solid var(--border); }
+.accordion > details > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 0; font-weight: 500; list-style: none; cursor: pointer;
+}
+.accordion > details > summary::-webkit-details-marker { display: none; }
+.accordion > details > summary::after { content: "+"; color: var(--text-muted); font-size: 18px; line-height: 1; }
+.accordion > details[open] > summary::after { content: "\2212"; }
+.accordion > details > :not(summary) { margin: 0 0 14px; color: var(--text-muted); }
+
+.toaster {
+  position: fixed; right: 16px; bottom: 16px; z-index: 50; display: flex; flex-direction: column-reverse; gap: 8px;
+  width: min(360px, calc(100vw - 32px)); pointer-events: none;
+}
+.toaster .toast { pointer-events: auto; transition: opacity 200ms ease, transform 200ms ease; }
+.toaster .toast[aria-hidden="true"] { opacity: 0; transform: translateY(8px); }
+.toaster .toast-content {
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); font-size: 13px;
+}
+.toaster .toast-content h2 { margin: 0 0 2px; font-size: 14px; font-weight: 600; }
+.toaster .toast-content p { margin: 0; color: var(--text-muted); }
+
+/* skipUI building blocks. */
+.skip-table-search { max-width: 320px; margin-bottom: 12px; }
+.skip-table-wrap { overflow-x: auto; }
+table.shell-table th[data-sort] { cursor: pointer; user-select: none; }
+table.shell-table th[aria-sort="ascending"]::after { content: " \25B2"; font-size: 9px; }
+table.shell-table th[aria-sort="descending"]::after { content: " \25BC"; font-size: 9px; }
+table.shell-table td.skip-table-empty { color: var(--text-muted); text-align: center; padding: 24px 0; }
+.skip-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+.toaster .toast[data-type="success"] .toast-content { border-left: 3px solid var(--success); }
+.toaster .toast[data-type="error"] .toast-content { border-left: 3px solid var(--danger); }
+
+</style>
+<script>
+/* Skip artifact shell — fixed helpers served beside every artifact. */
+(function () {
+  "use strict";
+
+  var fmt = {
+    num: function (v, opts) { return new Intl.NumberFormat("pt-BR", opts || {}).format(v); },
+    brl: function (v) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v); },
+    pct: function (v) { return new Intl.NumberFormat("pt-BR", { style: "percent", maximumFractionDigits: 1 }).format(v); },
+    compact: function (v) { return new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(v); },
+    brlCompact: function (v) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: 1 }).format(v); }
+  };
+
+  // axisLabels formats the five y-axis ticks in the unit the chart declared
+  // (percent, BRL or plain numbers), compact so long values never clip, with
+  // the fewest decimals that still print every tick exactly (1,5 mi, not 2 mi).
+  function axisLabels(format, ticks) {
+    function at(digits) {
+      var opts = { notation: "compact", maximumFractionDigits: digits };
+      if (format === "pct") opts = { style: "percent", maximumFractionDigits: digits };
+      else if (format === "brl") opts = { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: digits };
+      var nf = new Intl.NumberFormat("pt-BR", opts);
+      return ticks.map(function (t) { return nf.format(t); });
+    }
+    for (var digits = 0; digits < 2; digits++) {
+      if (at(digits).join("|") === at(digits + 1).join("|")) return at(digits);
+    }
+    return at(2);
+  }
+
+  // yAxisPad formats the ticks and measures the left padding they need from
+  // the longest one; drawYAxis then draws the grid and the labels.
+  function yAxisPad(format, max) {
+    var labels = axisLabels(format, [0, max / 4, max / 2, (max * 3) / 4, max]);
+    var longest = labels.reduce(function (m, l) { return Math.max(m, l.length); }, 0);
+    return { labels: labels, padL: Math.max(40, Math.round(longest * 6.2) + 14) };
+  }
+  function drawYAxis(svg, axis, W, padR, padT, plotH) {
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + plotH - (plotH * g) / 4;
+      svg.appendChild(svgEl("line", { x1: axis.padL, y1: gy, x2: W - padR, y2: gy, stroke: "currentColor", "stroke-opacity": 0.08 }));
+      var lbl = svgEl("text", { x: axis.padL - 8, y: gy + 4, "text-anchor": "end", "font-size": 10, fill: mutedColor() });
+      lbl.textContent = axis.labels[g];
+      svg.appendChild(lbl);
+    }
+  }
+
+  // xLabelStep: show every k-th category label so labels never overlap, and
+  // always the last one (counted back from the end).
+  function xLabelStep(labels, step) {
+    var longest = labels.reduce(function (m, l) { return Math.max(m, String(l).length); }, 0);
+    return Math.max(1, Math.ceil((longest * 6.4 + 8) / Math.max(step, 1)));
+  }
+  function drawXLabel(svg, text, x, y, W, edgeGuard) {
+    var anchor = "middle";
+    var half = String(text).length * 3.2;
+    if (edgeGuard && x - half < 4) anchor = "start";
+    if (edgeGuard && x + half > W - 4) anchor = "end";
+    var tx = svgEl("text", { x: x, y: y, "text-anchor": anchor, "font-size": 11, fill: mutedColor() });
+    tx.textContent = text;
+    svg.appendChild(tx);
+  }
+  // categoryLines fits a bar's category name in its slot: one line, two lines
+  // split at a space, or cut with "…". A bar without its name can't be read, so
+  // categories are never skipped; null when the slot is too narrow for that.
+  function categoryLines(text, slot) {
+    var fit = Math.floor((slot - 6) / 6.4);
+    var s = String(text);
+    if (fit < 4) return null;
+    if (s.length <= fit) return [s];
+    var cut = function (t) { return t.length <= fit ? t : t.slice(0, fit - 1).trimEnd() + "…"; };
+    var best = -1;
+    for (var i = 0; i < s.length; i++) {
+      if (s[i] === " " && (best < 0 || Math.abs(s.length / 2 - i) < Math.abs(s.length / 2 - best))) best = i;
+    }
+    if (best < 0) return [cut(s)];
+    return [cut(s.slice(0, best)), cut(s.slice(best + 1))];
+  }
+  function legend(el, items) {
+    var box = document.createElement("div");
+    box.className = "chart-legend";
+    items.forEach(function (it) {
+      var row = document.createElement("span");
+      var dot = document.createElement("i");
+      dot.style.background = it.color;
+      row.appendChild(dot);
+      row.appendChild(document.createTextNode((it.label || "") + (it.value ? " " : "")));
+      if (it.value) {
+        var v = document.createElement("b");
+        v.textContent = it.value;
+        row.appendChild(v);
+      }
+      box.appendChild(row);
+    });
+    resolve(el).appendChild(box);
+  }
+  var seriesPalette = ["#1baf7a", "#eda100", "#e34948", "#4a3aa7", "#e87ba4", "#0ea5b7"];
+
+  // format accepts a function OR one of the fmt names ("num" | "brl" | "pct").
+  // A page's function may return nothing or throw: the chart prints its
+  // number instead of taking the rest of the page script down with it.
+  function coerceFormat(spec) {
+    if (typeof spec === "function") {
+      return function (v) {
+        try {
+          var out = spec(v);
+          return out == null ? "" : String(out);
+        } catch (e) {
+          return fmt.num(v);
+        }
+      };
+    }
+    if (typeof spec === "string" && fmt[spec]) return fmt[spec];
+    return function (v) { return fmt.num(v); };
+  }
+
+  function accent() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#2563eb";
+  }
+  function mutedColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--text-muted").trim() || "#5b6472";
+  }
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function frame(el, w, h) {
+    var svg = svgEl("svg", { viewBox: "0 0 " + w + " " + h, role: "img" });
+    el = resolve(el);
+    el.innerHTML = "";
+    el.appendChild(svg);
+    return svg;
+  }
+
+  // maxOf guards the axis scale: empty values would give -Infinity (truthy,
+  // so "|| 1" can't catch it) and a non-positive max would flip the chart.
+  // finite reads a chart value as a number, 0 when it is not one (NaN,
+  // Infinity, a stray string), so one bad value cannot blank the axis.
+  function finite(v) {
+    var n = +v;
+    return isFinite(n) ? n : 0;
+  }
+
+  function maxOf(values) {
+    var m = values.length ? Math.max.apply(null, values.map(finite)) : 0;
+    return m > 0 ? m : 1;
+  }
+
+  // labelsFor pads or trims the category names to the n points drawn: pages
+  // pass labels and values of different lengths, and one throw here loses
+  // every section the page renders after the chart.
+  function labelsFor(cfg, n) {
+    var out = [];
+    for (var i = 0; i < n; i++) out.push(cfg.labels && cfg.labels[i] != null ? String(cfg.labels[i]) : "");
+    return out;
+  }
+
+  // niceMax rounds the scale up so the four grid steps land on round values
+  // (1, 1.5, 2, 2.5, 3, 4, 5, 6 or 8 × 10^k) and the tick labels read exactly.
+  function niceMax(max) {
+    var raw = max / 4;
+    var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    var res = raw / mag;
+    var steps = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+    var nice = steps.filter(function (s) { return s >= res - 1e-9; })[0];
+    return nice * mag * 4;
+  }
+
+  // bar(el, {labels:[], values:[], color?, format?}) — vertical bar chart.
+  function bar(el, cfg) {
+    var W = 640, H = 280, padB = 30, padT = 12, padR = 12;
+    var max = niceMax(maxOf(cfg.values));
+    var axis = yAxisPad(cfg.format, max);
+    var svg = frame(el, W, H);
+    var n = cfg.values.length;
+    var labels = labelsFor(cfg, n);
+    var plotW = W - axis.padL - padR;
+    var step = plotW / n, bw = Math.min(step * 0.62, 64);
+    var names = labels.map(function (l) { return categoryLines(l, step); });
+    var named = names.every(Boolean);
+    if (named && names.some(function (l) { return l.length > 1; })) padB = 42;
+    var plotH = H - padT - padB;
+    var color = cfg.color || accent();
+    var f = coerceFormat(cfg.format);
+    var every = xLabelStep(labels, step);
+    drawYAxis(svg, axis, W, padR, padT, plotH);
+    cfg.values.forEach(function (v, i) {
+      var bh = Math.max(0, (finite(v) / max) * plotH);
+      var x = axis.padL + i * step + (step - bw) / 2;
+      var y = padT + plotH - bh;
+      var r = svgEl("rect", { x: x, y: y, width: bw, height: bh, rx: 4, fill: (cfg.colors && cfg.colors[i]) || color });
+      var t = svgEl("title", {});
+      t.textContent = labels[i] + ": " + f(v);
+      r.appendChild(t);
+      svg.appendChild(r);
+      if (named) {
+        names[i].forEach(function (text, li) {
+          drawXLabel(svg, text, x + bw / 2, padT + plotH + 18 + li * 13, W, false);
+        });
+      } else if ((n - 1 - i) % every === 0) {
+        drawXLabel(svg, labels[i], x + bw / 2, H - 10, W, false);
+      }
+    });
+  }
+
+  // line(el, {labels:[], values:[] | series:[{label, values, color?}], color?, format?})
+  // — one line, or several series on one scale with a legend under the chart.
+  function line(el, cfg) {
+    var W = 640, H = 280, padB = 30, padT = 12, padR = 16;
+    var series = cfg.series && cfg.series.length
+      ? cfg.series
+      : [{ label: "", values: cfg.values || [], color: cfg.color }];
+    var all = [];
+    series.forEach(function (s) { all = all.concat(s.values || []); });
+    var max = niceMax(maxOf(all));
+    var axis = yAxisPad(cfg.format, max);
+    var svg = frame(el, W, H);
+    var n = series.reduce(function (m, s) { return Math.max(m, (s.values || []).length); }, 0);
+    var labels = labelsFor(cfg, n);
+    var plotW = W - axis.padL - padR, plotH = H - padT - padB;
+    var f = coerceFormat(cfg.format);
+    drawYAxis(svg, axis, W, padR, padT, plotH);
+    var xs = labels.map(function (_, i) { return axis.padL + (n === 1 ? plotW / 2 : (plotW * i) / (n - 1)); });
+    var every = xLabelStep(labels, n > 1 ? plotW / (n - 1) : plotW);
+    labels.forEach(function (label, i) {
+      if ((n - 1 - i) % every === 0) drawXLabel(svg, label, xs[i], H - 10, W, true);
+    });
+    var colors = series.map(function (s, si) {
+      return s.color || (si === 0 ? (cfg.color || accent()) : seriesPalette[(si - 1) % seriesPalette.length]);
+    });
+    series.forEach(function (s, si) {
+      var color = colors[si];
+      var pts = (s.values || []).map(function (v, i) { return [xs[i], padT + plotH - (finite(v) / max) * plotH]; });
+      var d = pts.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+      svg.appendChild(svgEl("path", { d: d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }));
+      pts.forEach(function (p, i) {
+        var c = svgEl("circle", { cx: p[0], cy: p[1], r: 3.5, fill: color });
+        var t = svgEl("title", {});
+        t.textContent = (s.label ? s.label + " · " : "") + labels[i] + ": " + f(s.values[i]);
+        c.appendChild(t);
+        svg.appendChild(c);
+      });
+    });
+    if (series.length > 1) {
+      legend(el, series.map(function (s, si) { return { label: s.label, color: colors[si] }; }));
+    }
+  }
+
+  // donut(el, {labels:[], values:[], colors?, format?, center?, centerLabel?, legend?})
+  // — donut with a short total in the centre (compact, in the declared unit)
+  // and, with legend: true, the labels and shares listed under it.
+  function donut(el, cfg) {
+    var W = 320, H = 280, cx = W / 2, cy = H / 2, R = 92, r = 58;
+    var svg = frame(el, W, H);
+    // At 100% of a wide container the donut outgrows the height pages give
+    // the box and spills over the next section: keep it at its own size.
+    svg.style.maxWidth = W + "px";
+    svg.style.margin = "0 auto";
+    var values = cfg.values.map(finite);
+    var labels = labelsFor(cfg, values.length);
+    var sum = values.reduce(function (a, b) { return a + b; }, 0);
+    var total = sum || 1;
+    var palette = cfg.colors || [accent()].concat(seriesPalette);
+    // The hover keeps the full value; the centre has room for a short one.
+    var full = coerceFormat(cfg.format);
+    var short = typeof cfg.format === "function" ? full : cfg.format === "brl" ? fmt.brlCompact : fmt.compact;
+    var a0 = -Math.PI / 2;
+    values.forEach(function (v, i) {
+      var a1 = a0 + (v / total) * Math.PI * 2;
+      var large = a1 - a0 > Math.PI ? 1 : 0;
+      var p = ["M", cx + R * Math.cos(a0), cy + R * Math.sin(a0),
+        "A", R, R, 0, large, 1, cx + R * Math.cos(a1), cy + R * Math.sin(a1),
+        "L", cx + r * Math.cos(a1), cy + r * Math.sin(a1),
+        "A", r, r, 0, large, 0, cx + r * Math.cos(a0), cy + r * Math.sin(a0), "Z"].join(" ");
+      var path = svgEl("path", { d: p, fill: palette[i % palette.length] });
+      var t = svgEl("title", {});
+      t.textContent = labels[i] + ": " + full(v) + " (" + fmt.pct(v / total) + ")";
+      path.appendChild(t);
+      svg.appendChild(path);
+      a0 = a1;
+    });
+    // A share chart has no total worth printing: without its own centre text
+    // the caption alone takes the middle.
+    var text = cfg.center != null ? String(cfg.center) : (cfg.format === "pct" ? "" : short(sum));
+    if (text) {
+      var size = text.length > 9 ? 14 : text.length > 7 ? 17 : 20;
+      var center = svgEl("text", { x: cx, y: cfg.centerLabel ? cy + 1 : cy + 6, "text-anchor": "middle", "font-size": size, "font-weight": 650, fill: "currentColor" });
+      center.textContent = text;
+      svg.appendChild(center);
+    }
+    if (cfg.centerLabel) {
+      var cap = svgEl("text", { x: cx, y: text ? cy + 19 : cy + 5, "text-anchor": "middle", "font-size": 11, fill: mutedColor() });
+      cap.textContent = cfg.centerLabel;
+      svg.appendChild(cap);
+    }
+    if (cfg.legend) {
+      legend(el, labels.map(function (label, i) {
+        return { label: label, color: palette[i % palette.length], value: fmt.pct(values[i] / total) };
+      }));
+    }
+  }
+
+  // ---- Page building blocks: what dashboards and small systems kept
+  // re-implementing — a searchable sortable table, a KPI row, tabs, toasts,
+  // dialogs, saved state and mock data. Every call is opt-in, so a page that
+  // brings its own versions keeps them.
+
+  function resolve(target) {
+    return typeof target === "string" ? document.querySelector(target) : target;
+  }
+
+  function node(tag, className, text) {
+    var el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text != null) el.textContent = text;
+    return el;
+  }
+
+  function isNumberColumn(col) {
+    return col.align === "right" || col.format === "num" || col.format === "brl" || col.format === "pct";
+  }
+
+  function cellText(col, row) {
+    var value = row[col.key];
+    if (value == null) return "";
+    return col.format ? coerceFormat(col.format)(value) : String(value);
+  }
+
+  function compareValues(a, b) {
+    if (typeof a === "number" && typeof b === "number") return a - b;
+    return String(a == null ? "" : a).localeCompare(String(b == null ? "" : b), "pt-BR", { numeric: true });
+  }
+
+  // table(el, {columns, rows, search?, pageSize?, empty?, onRowClick?}) — a
+  // table.shell-table with sortable headers, an optional search box and
+  // pager. A column is {key, label, format?, align?, sortable? (true),
+  // render?(value, row) returning a Node or an HTML string — the page writes
+  // its cell templates as markup}. Plain values are always set as text.
+  // Returns {setRows, rows}.
+  function table(target, cfg) {
+    var root = resolve(target);
+    var cols = cfg.columns || [];
+    var pageSize = cfg.pageSize || 0;
+    var state = { rows: (cfg.rows || []).slice(), query: "", key: null, dir: 1, page: 0 };
+    root.innerHTML = "";
+    if (cfg.search) {
+      var search = node("input", "input skip-table-search");
+      search.type = "search";
+      search.placeholder = typeof cfg.search === "string" ? cfg.search : "Buscar…";
+      search.setAttribute("aria-label", search.placeholder);
+      search.addEventListener("input", function () {
+        state.query = search.value.trim().toLowerCase();
+        state.page = 0;
+        draw();
+      });
+      root.appendChild(search);
+    }
+    var tableEl = node("table", "shell-table");
+    var headRow = node("tr");
+    var heads = cols.map(function (col) {
+      var th = node("th", isNumberColumn(col) ? "num" : "", col.label == null ? col.key : col.label);
+      th.scope = "col";
+      if (col.sortable !== false) {
+        var toggle = function () {
+          state.dir = state.key === col.key ? -state.dir : 1;
+          state.key = col.key;
+          draw();
+        };
+        th.setAttribute("data-sort", col.key);
+        th.tabIndex = 0;
+        th.addEventListener("click", toggle);
+        th.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+        });
+      }
+      headRow.appendChild(th);
+      return th;
+    });
+    var thead = node("thead");
+    var tbody = node("tbody");
+    var wrap = node("div", "skip-table-wrap");
+    var pager = node("div", "skip-pager");
+    thead.appendChild(headRow);
+    tableEl.appendChild(thead);
+    tableEl.appendChild(tbody);
+    wrap.appendChild(tableEl);
+    root.appendChild(wrap);
+    if (pageSize) root.appendChild(pager);
+
+    function visibleRows() {
+      var rows = state.rows;
+      if (state.query) {
+        rows = rows.filter(function (row) {
+          return cols.some(function (col) { return cellText(col, row).toLowerCase().indexOf(state.query) >= 0; });
+        });
+      }
+      if (state.key) {
+        var key = state.key, dir = state.dir;
+        rows = rows.slice().sort(function (a, b) { return dir * compareValues(a[key], b[key]); });
+      }
+      return rows;
+    }
+
+    function drawRow(row) {
+      var tr = node("tr");
+      cols.forEach(function (col) {
+        var td = node("td", isNumberColumn(col) ? "num" : "");
+        if (!col.render) {
+          td.textContent = cellText(col, row);
+        } else {
+          var content = col.render(row[col.key], row);
+          if (content instanceof Node) td.appendChild(content);
+          else td.innerHTML = content == null ? "" : String(content);
+        }
+        tr.appendChild(td);
+      });
+      // The row stays a row (no role) and takes focus, so a keyboard reaches
+      // the same action; keys pressed on a control inside a cell are its own.
+      if (cfg.onRowClick) {
+        tr.style.cursor = "pointer";
+        tr.tabIndex = 0;
+        tr.addEventListener("click", function () { cfg.onRowClick(row); });
+        tr.addEventListener("keydown", function (e) {
+          if (e.target !== tr || (e.key !== "Enter" && e.key !== " ")) return;
+          e.preventDefault();
+          cfg.onRowClick(row);
+        });
+      }
+      return tr;
+    }
+
+    function pagerButton(label, disabled, step) {
+      var button = node("button", "btn", label);
+      button.type = "button";
+      button.setAttribute("data-variant", "outline");
+      button.setAttribute("data-size", "sm");
+      button.disabled = disabled;
+      button.addEventListener("click", function () { state.page += step; draw(); });
+      return button;
+    }
+
+    function draw() {
+      var rows = visibleRows();
+      heads.forEach(function (th, i) {
+        if (cols[i].key === state.key) th.setAttribute("aria-sort", state.dir > 0 ? "ascending" : "descending");
+        else th.removeAttribute("aria-sort");
+      });
+      var pages = pageSize ? Math.max(1, Math.ceil(rows.length / pageSize)) : 1;
+      state.page = Math.min(state.page, pages - 1);
+      var shown = pageSize ? rows.slice(state.page * pageSize, (state.page + 1) * pageSize) : rows;
+      tbody.innerHTML = "";
+      if (!shown.length) {
+        var empty = node("td", "skip-table-empty", cfg.empty || "Nenhum registro encontrado.");
+        empty.colSpan = cols.length;
+        tbody.appendChild(node("tr")).appendChild(empty);
+      }
+      shown.forEach(function (row) { tbody.appendChild(drawRow(row)); });
+      if (!pageSize) return;
+      pager.innerHTML = "";
+      var from = rows.length ? state.page * pageSize + 1 : 0;
+      pager.appendChild(node("span", "", from + "–" + Math.min(rows.length, (state.page + 1) * pageSize) + " de " + rows.length));
+      var nav = node("div", "row gap-2");
+      nav.appendChild(pagerButton("Anterior", state.page === 0, -1));
+      nav.appendChild(pagerButton("Próxima", state.page >= pages - 1, 1));
+      pager.appendChild(nav);
+    }
+
+    draw();
+    return {
+      setRows: function (rows) { state.rows = rows.slice(); draw(); },
+      rows: visibleRows
+    };
+  }
+
+  // kpis(el, [{label, value, format?, delta?, hint?}]) — KPI cards in a
+  // responsive grid; delta is a fraction (0.12 renders as ▲ 12%).
+  function kpis(target, items) {
+    var root = resolve(target);
+    root.innerHTML = "";
+    root.classList.add("shell-grid");
+    items.forEach(function (item) {
+      var card = node("div", "panel kpi");
+      card.appendChild(node("span", "kpi-label", item.label));
+      // Large money values go compact ("R$ 27,5 mi"): the full amount does
+      // not fit a KPI card at four per row.
+      var kpiFormat = item.format === "brl" && Math.abs(item.value) >= 1e6 ? fmt.brlCompact : (item.format ? coerceFormat(item.format) : null);
+      card.appendChild(node("span", "kpi-value", kpiFormat ? kpiFormat(item.value) : String(item.value)));
+      if (typeof item.delta === "number") {
+        var up = item.delta >= 0;
+        card.appendChild(node("span", "kpi-delta " + (up ? "up" : "down"), (up ? "▲ " : "▼ ") + fmt.pct(Math.abs(item.delta))));
+      }
+      if (item.hint) card.appendChild(node("span", "kpi-label", item.hint));
+      root.appendChild(card);
+    });
+  }
+
+  // badge(text, variant?) — a .badge node for table cells and lists;
+  // variant is "secondary" | "outline" | "destructive" (default: primary).
+  function badge(text, variant) {
+    var el = node("span", "badge", text);
+    if (variant) el.setAttribute("data-variant", variant);
+    return el;
+  }
+
+  // tabs(el) — wires one .tabs block: [role=tab] buttons inside
+  // [role=tablist], each with aria-controls naming its [role=tabpanel].
+  function tabs(target) {
+    var root = resolve(target);
+    var buttons = Array.prototype.slice.call(root.querySelectorAll('[role="tab"]'));
+    function select(chosen) {
+      buttons.forEach(function (b) {
+        var on = b === chosen;
+        b.setAttribute("aria-selected", on ? "true" : "false");
+        b.tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(b.getAttribute("aria-controls"));
+        if (panel) panel.hidden = !on;
+      });
+    }
+    buttons.forEach(function (b, i) {
+      b.addEventListener("click", function () { select(b); });
+      b.addEventListener("keydown", function (e) {
+        var step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!step) return;
+        var next = buttons[(i + step + buttons.length) % buttons.length];
+        next.focus();
+        select(next);
+      });
+    });
+    select(buttons.filter(function (b) { return b.getAttribute("aria-selected") === "true"; })[0] || buttons[0]);
+  }
+
+  // toast(message, {type?: "success" | "error", title?, duration?}) — a
+  // .toast in a shared .toaster at the bottom of the page.
+  function toast(message, opts) {
+    opts = opts || {};
+    var toaster = document.querySelector(".toaster") || document.body.appendChild(node("div", "toaster"));
+    var item = node("div", "toast");
+    item.setAttribute("role", opts.type === "error" ? "alert" : "status");
+    item.setAttribute("aria-hidden", "true");
+    if (opts.type) item.setAttribute("data-type", opts.type);
+    var content = node("div", "toast-content");
+    var section = node("section");
+    if (opts.title) section.appendChild(node("h2", "", opts.title));
+    section.appendChild(node("p", "", message));
+    content.appendChild(section);
+    item.appendChild(content);
+    toaster.appendChild(item);
+    requestAnimationFrame(function () { item.setAttribute("aria-hidden", "false"); });
+    setTimeout(function () {
+      item.setAttribute("aria-hidden", "true");
+      setTimeout(function () { item.remove(); }, 400);
+    }, opts.duration || 3000);
+  }
+
+  // Dialogs are native <dialog class="dialog">: a [data-dialog-open="id"]
+  // anywhere opens one, a [data-dialog-close] inside closes it, and a click on
+  // its backdrop closes it too. Plain dialog.showModal()/close() still work.
+  document.addEventListener("click", function (e) {
+    var target = e.target;
+    if (!(target instanceof Element)) return;
+    var opener = target.closest("[data-dialog-open]");
+    if (opener) {
+      var dialog = document.getElementById(opener.getAttribute("data-dialog-open"));
+      if (dialog && dialog.showModal && !dialog.open) dialog.showModal();
+      return;
+    }
+    var closer = target.closest("[data-dialog-close]");
+    if (closer && closer.closest("dialog")) {
+      closer.closest("dialog").close();
+      return;
+    }
+    if (target.tagName === "DIALOG" && target.classList.contains("dialog") && target.open) target.close();
+  });
+
+  // store(key, fallback) — JSON state in localStorage that never throws (a
+  // private window or a full quota falls back to memory): {get, set, update}.
+  function store(key, fallback) {
+    var memory;
+    // Set while the last write did not reach localStorage: what is stored
+    // there is older than memory until a write goes through again.
+    var unsaved = false;
+    var initial = function () { return fallback === undefined ? undefined : JSON.parse(JSON.stringify(fallback)); };
+    function get() {
+      if (!unsaved) {
+        try {
+          var raw = localStorage.getItem(key);
+          if (raw != null) return JSON.parse(raw);
+        } catch (e) { /* storage unavailable: memory below */ }
+      }
+      return memory !== undefined ? memory : initial();
+    }
+    function set(value) {
+      memory = value;
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        unsaved = false;
+      } catch (e) {
+        unsaved = true;
+      }
+      return value;
+    }
+    return { get: get, set: set, update: function (fn) { return set(fn(get())); } };
+  }
+
+  // mock — seeded random data, so a page asks for 90 days of numbers in one
+  // line instead of writing them out; the same seed gives the same data.
+  var FIRST = ["Ana", "Bruno", "Carla", "Diego", "Eduarda", "Felipe", "Gabriela", "Henrique", "Isabela", "João",
+    "Larissa", "Marcos", "Natália", "Otávio", "Paula", "Rafael", "Sofia", "Thiago", "Vanessa", "Lucas"];
+  var LAST = ["Silva", "Santos", "Oliveira", "Souza", "Pereira", "Costa", "Rodrigues", "Almeida", "Nascimento", "Lima",
+    "Araújo", "Fernandes", "Carvalho", "Gomes", "Martins", "Rocha", "Ribeiro", "Barbosa"];
+  var INITIALS = "ABCDEFGHIJLMNOPRSTV".split("");
+  var CITIES = ["São Paulo, SP", "Rio de Janeiro, RJ", "Belo Horizonte, MG", "Curitiba, PR", "Porto Alegre, RS",
+    "Salvador, BA", "Recife, PE", "Fortaleza, CE", "Brasília, DF", "Goiânia, GO", "Campinas, SP", "Florianópolis, SC",
+    "Manaus, AM", "Belém, PA", "Vitória, ES", "Natal, RN"];
+
+  function createMock(seed) {
+    var state = seed >>> 0;
+    var names = 0;
+    function random() {
+      state = (state + 0x6d2b79f5) >>> 0;
+      var t = state;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+    function int(min, max) { return min + Math.floor(random() * (max - min + 1)); }
+    function pick(list) { return list[Math.floor(random() * list.length)]; }
+    var mock = {
+      seed: function (value) { state = value >>> 0; names = 0; return mock; },
+      random: random,
+      int: int,
+      float: function (min, max, decimals) {
+        var factor = Math.pow(10, decimals == null ? 2 : decimals);
+        return Math.round((min + random() * (max - min)) * factor) / factor;
+      },
+      pick: pick,
+      chance: function (p) { return random() < p; },
+      // There are 360 first/last pairs. A page that draws until the name is
+      // new (do { … } while (used.has(name))) froze the tab past them, so
+      // later draws widen the space: a second surname after 200 (6,480), a
+      // middle initial after 4,000.
+      name: function () {
+        names++;
+        var middle = names > 4000 ? pick(INITIALS) + ". " : "";
+        return pick(FIRST) + " " + middle + (names > 200 ? pick(LAST) + " " : "") + pick(LAST);
+      },
+      city: function () { return pick(CITIES); },
+      // series(n, {start, trend, noise, min, decimals}) — a walk: each value
+      // moves by trend (fraction per step) plus up to ±noise of itself.
+      series: function (n, opts) {
+        opts = opts || {};
+        var value = opts.start == null ? 100 : opts.start;
+        var factor = Math.pow(10, opts.decimals || 0);
+        var out = [];
+        for (var i = 0; i < n; i++) {
+          out.push(Math.max(opts.min == null ? 0 : opts.min, Math.round(value * factor) / factor));
+          value = value * (1 + (opts.trend || 0)) * (1 + (random() * 2 - 1) * (opts.noise == null ? 0.08 : opts.noise));
+        }
+        return out;
+      },
+      // dates(n, {end?, step?: "day" | "week" | "month"}) — ISO dates
+      // (YYYY-MM-DD), oldest first, ending at end (default: today).
+      dates: function (n, opts) {
+        opts = opts || {};
+        var end = opts.end ? new Date(opts.end) : new Date();
+        var out = [];
+        for (var i = n - 1; i >= 0; i--) {
+          var d = new Date(end.getTime());
+          if (opts.step === "month") d.setMonth(d.getMonth() - i);
+          else d.setDate(d.getDate() - i * (opts.step === "week" ? 7 : 1));
+          out.push(d.toISOString().slice(0, 10));
+        }
+        return out;
+      },
+      // rows(n, spec) — n objects; each spec value is a function(i), a list
+      // to pick from, or a constant.
+      rows: function (n, spec) {
+        var out = [];
+        for (var i = 0; i < n; i++) {
+          var row = {};
+          for (var key in spec) {
+            var value = spec[key];
+            row[key] = typeof value === "function" ? value(i) : Array.isArray(value) ? pick(value) : value;
+          }
+          out.push(row);
+        }
+        return out;
+      }
+    };
+    return mock;
+  }
+
+  window.skipShell = { fmt: fmt };
+  window.skipChart = { bar: bar, line: line, donut: donut };
+  window.skipUI = { table: table, kpis: kpis, badge: badge, tabs: tabs, toast: toast };
+  window.skipStore = store;
+  window.skipMock = createMock(20261022);
+})();
+
+</script>
+<style>
+:root{
+--primary:#1e3a8a;--secondary:#dc2626;--highlight:#facc15;
+--n0:#ffffff;--n1:#f9fafb;--n2:#f3f4f6;--n3:#e5e7eb;--n4:#d1d5db;--n5:#9ca3af;--n6:#6b7280;--n7:#4b5563;--n8:#374151;--n9:#1f2937;--n10:#111827;
+--accent:#1e3a8a;--accent-text:#1e3a8a;--accent-contrast:#ffffff;
+--font-title:"Barlow Condensed","Oswald",Impact,sans-serif;
+--font-body:"Source Serif 4",Lora,Georgia,serif;
+--font-ui:"Inter",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font-ui);background:var(--n1);color:var(--n10);line-height:1.5}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--highlight);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.title-font{font-family:var(--font-title);font-weight:800;letter-spacing:-.01em;text-transform:uppercase}
+.card{background:var(--n0);border:1px solid var(--n3);border-radius:8px;box-shadow:0 1px 3px rgba(17,24,39,.06),0 4px 12px rgba(17,24,39,.04)}
+.cat-band{display:inline-block;background:var(--secondary);color:#fff;font:700 12px/1 var(--font-ui);letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:4px}
+.seal{display:inline-block;background:var(--primary);color:#fff;font:700 12px/1 var(--font-ui);letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:4px}
+.pill{display:inline-block;background:var(--n2);color:var(--n8);font:600 12px/1 var(--font-ui);padding:6px 10px;border-radius:999px;border:1px solid var(--n3)}
+.muted{color:var(--n7)}
+.small{font-size:13px}
+.eyebrow{font:600 12px/1.2 var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--n7)}
+
+/* progress bar */
+#readProgress{position:fixed;top:0;left:0;height:4px;width:0;background:var(--secondary);z-index:200;transition:width .1s linear}
+
+/* topbar */
+.topbar{background:var(--primary);color:#fff;font-size:13px}
+.topbar .inner{max-width:1200px;margin:0 auto;padding:8px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.topbar .meta{display:flex;gap:14px;flex-wrap:wrap;opacity:.95}
+.social-row{display:flex;gap:6px}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:transparent;border:1px solid transparent;color:inherit;cursor:pointer;transition:transform .2s,background .2s}
+.topbar .icon-btn:hover{background:rgba(255,255,255,.15);transform:translateY(-1px)}
+.icon-btn svg{width:16px;height:16px;fill:currentColor}
+
+/* header */
+.header{background:var(--n0);border-bottom:1px solid var(--n3);position:sticky;top:0;z-index:100}
+.header .inner{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--n10)}
+.logo-text{font-family:var(--font-title);font-weight:800;font-size:26px;line-height:.9;letter-spacing:.01em}
+.logo-text small{display:block;font-size:11px;letter-spacing:.2em;color:var(--n7);font-weight:600;font-family:var(--font-ui)}
+.slogan{font-size:13px;color:var(--n7);max-width:260px;line-height:1.35}
+.search{flex:1;max-width:340px;position:relative;margin-left:auto}
+.search input{width:100%;height:40px;border:1px solid var(--n4);border-radius:999px;padding:0 16px 0 40px;font:14px var(--font-ui);background:var(--n1)}
+.search input:focus{border-color:var(--primary);background:#fff}
+.search svg{position:absolute;left:13px;top:11px;width:17px;height:17px;stroke:var(--n6);fill:none;stroke-width:2}
+.btn-assine{background:var(--highlight);color:var(--n10);border:none;font:800 15px var(--font-title);letter-spacing:.06em;padding:10px 20px;border-radius:6px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.btn-assine:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(250,204,21,.45)}
+
+/* nav */
+.mainnav{background:var(--primary);position:relative}
+.mainnav .inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;padding:0 20px}
+.menu-toggle{display:none;background:none;border:none;color:#fff;padding:12px 4px;cursor:pointer}
+.menu-toggle svg{width:24px;height:24px;stroke:#fff;stroke-width:2;fill:none}
+.menu{list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:4px}
+.menu>li{position:relative}
+.menu>li>a,.menu>li>button{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;font:700 14px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;padding:16px 14px;background:none;border:none;cursor:pointer;position:relative}
+.menu>li>a::after,.menu>li>button::after{content:"";position:absolute;left:14px;right:14px;bottom:8px;height:3px;background:var(--highlight);transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
+.menu>li>a:hover::after,.menu>li>button:hover::after,.menu>li>a:focus-visible::after,.menu>li.open>button::after{transform:scaleX(1)}
+.submenu{position:absolute;top:100%;left:0;background:var(--n0);min-width:220px;list-style:none;margin:0;padding:6px 0;border-radius:0 0 8px 8px;box-shadow:0 10px 24px rgba(0,0,0,.2);opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .2s,transform .2s}
+.menu>li.open .submenu{opacity:1;transform:none;pointer-events:auto}
+.submenu a{display:block;padding:10px 16px;color:var(--n9);text-decoration:none;font:600 14px var(--font-ui)}
+.submenu a:hover{background:var(--n2);color:var(--primary)}
+.caret{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2}
+
+/* layout */
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.breadcrumb{font-size:13px;color:var(--n6);padding:16px 0 4px}
+.breadcrumb a{color:var(--n6);text-decoration:none}
+.breadcrumb a:hover{color:var(--primary);text-decoration:underline}
+.breadcrumb span.sep{margin:0 8px;color:var(--n5)}
+.page-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:40px;align-items:start;padding-bottom:40px}
+.article-col{min-width:0}
+.reading{max-width:760px;margin:0 auto}
+.share-float{position:fixed;left:max(12px,calc((100vw - 1200px)/2 - 64px));top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;z-index:50;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}
+.share-float.show{opacity:1;pointer-events:auto}
+
+/* header article */
+.badges{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+h1.headline{font-family:var(--font-title);font-weight:800;font-size:54px;line-height:1.02;letter-spacing:-.01em;margin:0 0 16px;color:var(--n10);text-transform:uppercase}
+.dek{font:italic 400 20px/1.5 var(--font-body);color:var(--n7);margin:0 0 22px}
+.byline{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:14px;color:var(--n7);padding:14px 0;border-top:1px solid var(--n3);border-bottom:1px solid var(--n3)}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 14px var(--font-ui);flex-shrink:0}
+.byline a{color:var(--primary);font-weight:700;text-decoration:none}
+.byline a:hover{text-decoration:underline}
+.byline .dot{color:var(--n5)}
+.share-bar{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.sbtn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 12px;border-radius:6px;border:1px solid var(--n4);background:var(--n0);font:600 13px var(--font-ui);color:var(--n8);cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.sbtn svg{width:15px;height:15px;fill:currentColor}
+.sbtn:hover{background:var(--n2);border-color:var(--n5)}
+.sbtn.wa svg{fill:#15803d}
+.sbtn.saved{background:var(--highlight);border-color:#eab308;color:var(--n10)}
+.sbtn.saved svg{fill:currentColor}
+.sbtn.copied{background:#dcfce7;border-color:#16a34a;color:#166534}
+.share-note{font-size:12px;color:var(--n6);margin-top:4px}
+
+/* hero image */
+.hero{max-width:1000px;margin:24px auto 0}
+.hero-img{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#dc2626 100%)}
+.hero-img::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(120deg,rgba(255,255,255,.05) 0 2px,transparent 2px 22px)}
+.hero-img::after{content:"";position:absolute;width:60%;height:140%;left:-10%;top:-20%;background:radial-gradient(circle,rgba(250,204,21,.35),transparent 60%)}
+.hero-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1}
+.hero-icon svg{width:38%;max-width:200px;height:auto;opacity:.92;filter:drop-shadow(0 8px 20px rgba(0,0,0,.35))}
+.hero-tag{position:absolute;left:16px;top:16px;z-index:2}
+.caption{font:italic 14px/1.5 var(--font-ui);color:var(--n6);margin-top:10px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.caption .credit{text-align:right;margin-left:auto;font-style:normal;font-size:13px}
+
+/* body */
+.body{font:400 19.5px/1.7 var(--font-body);color:var(--n9);max-width:720px;margin:36px auto 0}
+.body p{margin:0 0 1.35em;max-width:68ch}
+.body p.lead{font-size:21px;color:var(--n10)}
+.body p.first::first-letter{float:left;font-family:var(--font-title);font-weight:800;font-size:92px;line-height:.82;padding:8px 12px 0 0;color:var(--secondary)}
+.body h2{font-family:var(--font-title);font-weight:800;font-size:32px;line-height:1.1;text-transform:uppercase;color:var(--primary);margin:48px 0 16px;letter-spacing:-.005em}
+.body a.inlink{color:var(--secondary);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;font-weight:600}
+.body a.inlink:hover{color:#991b1b}
+blockquote.pull{margin:40px 0;padding:8px 0 8px 28px;border-left:4px solid var(--secondary);position:relative}
+blockquote.pull::before{content:"\201C";position:absolute;left:-2px;top:-30px;font:800 90px/1 var(--font-title);color:var(--secondary);opacity:.9}
+blockquote.pull p{font:italic 400 26px/1.4 var(--font-body);color:var(--n10);margin:0 0 12px}
+blockquote.pull footer{font:600 14px var(--font-ui);color:var(--n7);font-style:normal}
+.stats-box{background:var(--n1);border:1px solid var(--n3);border-left:4px solid var(--primary);border-radius:8px;padding:22px 24px;margin:36px 0;font-family:var(--font-ui)}
+.stats-box h3{margin:0 0 14px;font:800 18px var(--font-title);letter-spacing:.08em;color:var(--primary);text-transform:uppercase}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.stat{background:#fff;border:1px solid var(--n3);border-radius:8px;padding:14px}
+.stat .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--n6);font-weight:600}
+.stat .val{font:800 30px/1.1 var(--font-title);color:var(--n10);margin-top:4px}
+.stat .pct{font-size:13px;color:var(--n7)}
+.stat .bar{height:6px;background:var(--n3);border-radius:4px;margin-top:8px;overflow:hidden}
+.stat .bar i{display:block;height:100%;background:var(--primary)}
+.stat.home .bar i{background:var(--secondary)}
+.video{margin:36px 0;border-radius:8px;overflow:hidden;border:1px solid var(--n3);background:var(--n10)}
+.video-frame{position:relative;aspect-ratio:16/9;background:linear-gradient(160deg,#111827,#1e3a8a 60%,#7f1d1d)}
+.play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:76px;height:76px;border-radius:50%;background:var(--secondary);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(220,38,38,.6);animation:pulse 2s infinite;transition:transform .2s}
+.play:hover{transform:translate(-50%,-50%) scale(1.08)}
+.play svg{width:28px;height:28px;fill:#fff;margin-left:4px}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,38,38,.55)}70%{box-shadow:0 0 0 18px rgba(220,38,38,0)}100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}}
+.dur{position:absolute;right:12px;bottom:12px;background:rgba(0,0,0,.75);color:#fff;font:600 13px var(--font-ui);padding:4px 8px;border-radius:4px}
+.video-cap{padding:12px 16px;color:#e5e7eb;font:500 14px var(--font-ui);background:var(--n10)}
+.next-game{background:var(--n2);border-radius:8px;padding:18px 20px;margin-top:28px;font-family:var(--font-ui);font-size:16px;color:var(--n9);border:1px solid var(--n3)}
+.next-game strong{color:var(--primary)}
+
+.tags{display:flex;flex-wrap:wrap;gap:8px;max-width:720px;margin:28px auto 0}
+.chip{display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;background:var(--n0);border:1px solid var(--n4);color:var(--n8);font:600 13px var(--font-ui);text-decoration:none;cursor:pointer;transition:all .2s}
+.chip:hover{border-color:var(--primary);color:var(--primary);background:#eff6ff}
+
+/* author box */
+.author-box{max-width:720px;margin:36px auto 0;padding:22px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.avatar-lg{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#2563eb);color:#fff;display:flex;align-items:center;justify-content:center;font:800 30px var(--font-title);flex-shrink:0}
+.author-info{flex:1;min-width:220px}
+.author-info h3{margin:0;font:800 22px var(--font-title);text-transform:uppercase;color:var(--n10)}
+.author-info p{margin:4px 0 10px;font-size:15px;color:var(--n7);line-height:1.5}
+.author-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 16px;border-radius:6px;font:700 14px var(--font-ui);cursor:pointer;border:1px solid var(--primary);background:var(--primary);color:#fff;transition:background .2s,color .2s,transform .15s}
+.btn:hover{background:#1e40af;transform:translateY(-1px)}
+.btn.outline{background:#fff;color:var(--primary)}
+.btn.outline:hover{background:#eff6ff}
+.btn.following{background:var(--n2);color:var(--n9);border-color:var(--n5)}
+.author-social{display:flex;gap:6px}
+.author-social .icon-btn{color:var(--n7);border-color:var(--n3);background:#fff}
+.author-social .icon-btn:hover{color:var(--primary);background:#eff6ff}
+.author-social .icon-btn svg{fill:currentColor}
+
+/* related */
+section.related{max-width:1000px;margin:52px auto 0}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:18px;border-bottom:3px solid var(--primary);padding-bottom:8px}
+.sec-head h2{margin:0;font:800 26px var(--font-title);text-transform:uppercase;color:var(--primary)}
+.sec-head p{margin:0;font-size:14px;color:var(--n7)}
+.rel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.rel-card{overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:transform .25s,box-shadow .25s}
+.rel-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(17,24,39,.12)}
+.rel-img{aspect-ratio:16/9;position:relative}
+.rel-img .cat-band{position:absolute;left:12px;top:12px}
+.rel-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.rel-body h3{margin:0;font:800 20px/1.15 var(--font-title);text-transform:uppercase;color:var(--n10)}
+.rel-meta{margin-top:auto;font-size:12.5px;color:var(--n6);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.g1{background:linear-gradient(135deg,#1e3a8a,#3b82f6)}
+.g2{background:linear-gradient(135deg,#7f1d1d,#dc2626)}
+.g3{background:linear-gradient(135deg,#166534,#22c55e)}
+.g4{background:linear-gradient(135deg,#374151,#9ca3af)}
+
+/* comments */
+section.comments{max-width:720px;margin:52px auto 0}
+.comment-form{display:flex;gap:12px;align-items:flex-start;padding:18px;margin-bottom:24px}
+.comment-form textarea{flex:1;min-height:76px;border:1px solid var(--n4);border-radius:8px;padding:12px;font:15px var(--font-ui);resize:vertical;background:var(--n1)}
+.comment-form textarea:focus{border-color:var(--primary);background:#fff;outline:none;box-shadow:0 0 0 3px rgba(30,58,138,.15)}
+.comment-form .help{font-size:12px;color:var(--n6);margin-top:6px}
+.comment{display:flex;gap:14px;padding:18px 0;border-bottom:1px solid var(--n3)}
+.comment .avatar{width:44px;height:44px;font-size:14px}
+.comment-body{flex:1}
+.comment-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}
+.comment-head strong{color:var(--n10)}
+.comment-head time{color:var(--n6);font-size:13px}
+.editor-seal{background:var(--highlight);color:var(--n10);font:800 11px var(--font-ui);letter-spacing:.08em;padding:3px 7px;border-radius:4px}
+.comment p{margin:6px 0 10px;font:400 16px/1.6 var(--font-body);color:var(--n9)}
+.comment-actions{display:flex;gap:16px;font-size:13px}
+.comment-actions button{background:none;border:none;color:var(--n7);cursor:pointer;font:600 13px var(--font-ui);padding:4px 0}
+.comment-actions button:hover{color:var(--primary);text-decoration:underline}
+.like-count{font-variant-numeric:tabular-nums}
+
+/* sidebar */
+aside.sidebar{position:sticky;top:110px;display:flex;flex-direction:column;gap:20px}
+.widget{padding:18px}
+.widget h3{margin:0 0 14px;font:800 18px var(--font-title);text-transform:uppercase;color:var(--primary);display:flex;justify-content:space-between;align-items:center;letter-spacing:.04em}
+.widget-sub{font-size:12px;color:var(--n6);margin:-8px 0 12px}
+.mostread{list-style:none;margin:0;padding:0;counter-reset:mr}
+.mostread li{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--n3)}
+.mostread li:last-child{border-bottom:none;padding-bottom:0}
+.mostread .n{font:800 34px/1 var(--font-title);color:var(--secondary);min-width:34px}
+.mostread li:nth-child(n+4) .n{color:var(--n5)}
+.mostread a{font:700 15px/1.3 var(--font-ui);color:var(--n10);text-decoration:none}
+.mostread a:hover{color:var(--primary);text-decoration:underline}
+.mostread small{display:block;font-size:12px;color:var(--n6);margin-top:3px}
+.live-head{display:flex;align-items:center;gap:8px;font:800 14px var(--font-title);letter-spacing:.1em;color:var(--secondary)}
+.live-dot{width:9px;height:9px;border-radius:50%;background:var(--secondary);animation:ping 1.4s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(220,38,38,.6)}100%{box-shadow:0 0 0 10px rgba(220,38,38,0)}}
+.scores{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:thin}
+.score{min-width:230px;scroll-snap-align:start;background:var(--n1);border:1px solid var(--n3);border-radius:8px;padding:12px}
+.score-top{display:flex;justify-content:space-between;font-size:11px;color:var(--n6);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.team-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.team{display:flex;align-items:center;gap:8px;font:700 14px var(--font-ui)}
+.shield{width:28px;height:28px;border-radius:50%;color:#fff;font:800 10px var(--font-ui);display:flex;align-items:center;justify-content:center}
+.sc{font:800 22px var(--font-title);color:var(--n10)}
+.scroll-nav{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
+.scroll-nav button{width:30px;height:30px;border-radius:50%;border:1px solid var(--n4);background:#fff;cursor:pointer;font-weight:700;color:var(--n8)}
+.scroll-nav button:hover{background:var(--n2)}
+.nl-input{width:100%;height:42px;border:1px solid var(--n4);border-radius:6px;padding:0 12px;font:14px var(--font-ui);margin-bottom:10px}
+.nl-input:focus{outline:2px solid var(--primary);border-color:transparent}
+.btn-yellow{width:100%;height:44px;border:none;border-radius:6px;background:var(--highlight);color:var(--n10);font:800 16px var(--font-title);letter-spacing:.06em;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.btn-yellow:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(250,204,21,.4)}
+.micro{font-size:12px;color:var(--n6);margin-top:8px}
+.ad{text-align:center}
+.ad-box{width:100%;max-width:300px;height:250px;margin:0 auto;border-radius:6px;background:repeating-linear-gradient(45deg,var(--n2),var(--n2) 10px,var(--n3) 10px,var(--n3) 20px);display:flex;align-items:center;justify-content:center;color:var(--n7);font:600 14px var(--font-ui);border:1px dashed var(--n5)}
+.ad-label{font-size:10px;letter-spacing:.14em;color:var(--n6);margin-top:6px;display:block}
+.follow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.follow-grid a{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:var(--n8);font-size:11px;font-weight:600;padding:10px 4px;border-radius:6px;border:1px solid var(--n3);background:#fff;transition:background .2s}
+.follow-grid a:hover{background:var(--n2)}
+.follow-grid svg{width:20px;height:20px;fill:var(--primary)}
+
+/* newsletter band */
+.nl-band{background:var(--primary);color:#fff;position:relative;overflow:hidden;margin-top:12px}
+.nl-band::before{content:"";position:absolute;inset:-50% -20% auto -20%;height:200%;background:linear-gradient(115deg,transparent 0 62%,rgba(250,204,21,.14) 62% 66%,transparent 66%);transform:rotate(-4deg);pointer-events:none}
+.nl-inner{max-width:1200px;margin:0 auto;padding:44px 20px;display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap;position:relative}
+.nl-inner h2{margin:0 0 6px;font:800 36px/1.05 var(--font-title);text-transform:uppercase}
+.nl-inner p{margin:0;opacity:.9;max-width:520px;font-size:16px}
+.nl-form{display:flex;gap:10px;flex-wrap:wrap;flex:0 1 420px}
+.nl-form input{flex:1;min-width:200px;height:48px;border-radius:6px;border:none;padding:0 14px;font:15px var(--font-ui)}
+.nl-form button{height:48px;padding:0 22px;background:var(--highlight);color:var(--n10);border:none;border-radius:6px;font:800 16px var(--font-title);letter-spacing:.06em;cursor:pointer}
+.nl-form button:hover{box-shadow:0 6px 14px rgba(0,0,0,.25)}
+
+/* footer */
+footer.site-footer{background:var(--n9);color:var(--n4);padding:52px 0 0;margin-top:0}
+.foot-grid{max-width:1200px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:1.6fr 1fr 1fr 1.3fr;gap:36px}
+.foot-logo{font:800 24px var(--font-title);color:#fff;letter-spacing:.01em}
+.foot-grid p{font-size:14px;line-height:1.6;margin:12px 0 16px;color:var(--n5)}
+.foot-grid h4{margin:0 0 14px;font:800 15px var(--font-title);letter-spacing:.1em;color:#fff;text-transform:uppercase}
+.foot-grid ul{list-style:none;margin:0;padding:0}
+.foot-grid li{margin-bottom:9px}
+.foot-grid li a{color:var(--n4);text-decoration:none;font-size:14px}
+.foot-grid li a:hover{color:var(--highlight);text-decoration:underline}
+.foot-grid .social-row .icon-btn{color:var(--n4);border:1px solid var(--n7)}
+.foot-grid .social-row .icon-btn:hover{color:var(--highlight);border-color:var(--highlight);background:transparent}
+.foot-nl{display:flex;flex-direction:column;gap:8px}
+.foot-nl input{height:40px;border-radius:6px;border:1px solid var(--n7);background:var(--n10);color:#fff;padding:0 10px;font:14px var(--font-ui)}
+.foot-nl button{height:40px;border:none;border-radius:6px;background:var(--highlight);color:var(--n10);font:800 14px var(--font-title);letter-spacing:.06em;cursor:pointer}
+.foot-bottom{border-top:1px solid var(--n8);margin-top:40px;padding:18px 20px;text-align:center;font-size:13px;color:var(--n5)}
+
+/* search modal */
+dialog.search-dialog{border:none;border-radius:8px;padding:0;width:min(640px,92vw);max-height:80vh;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+dialog.search-dialog::backdrop{background:rgba(17,24,39,.6)}
+.sd-head{padding:18px 20px;border-bottom:1px solid var(--n3);display:flex;justify-content:space-between;align-items:center}
+.sd-head h2{margin:0;font:800 20px var(--font-title);text-transform:uppercase;color:var(--primary)}
+.sd-list{list-style:none;margin:0;padding:8px 0;max-height:55vh;overflow:auto}
+.sd-list li{padding:12px 20px;border-bottom:1px solid var(--n2)}
+.sd-list a{font:700 16px var(--font-ui);color:var(--n10);text-decoration:none}
+.sd-list a:hover{color:var(--primary);text-decoration:underline}
+.sd-list small{display:block;color:var(--n6);font-size:12.5px;margin-top:2px}
+.sd-empty{padding:24px 20px;color:var(--n7)}
+
+/* back to top */
+.to-top{position:fixed;right:20px;bottom:20px;width:48px;height:48px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(17,24,39,.3);display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .3s,transform .3s;z-index:90}
+.to-top.show{opacity:1;transform:none;pointer-events:auto}
+.to-top:hover{background:var(--secondary)}
+.toast-tip{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--n10);color:#fff;padding:10px 16px;border-radius:6px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:300}
+.toast-tip.show{opacity:1}
+
+/* responsive */
+@media (max-width:1199px){
+.page-grid{grid-template-columns:1fr}
+aside.sidebar{position:static;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+aside.sidebar .ad{grid-column:1/-1}
+.share-float{display:none}
+h1.headline{font-size:50px}
+}
+@media (max-width:900px){
+.rel-grid{grid-template-columns:1fr 1fr}
+.nl-inner h2{font-size:30px}
+.foot-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:767px){
+.topbar .meta .hide-m{display:none}
+.header .inner{flex-wrap:wrap;gap:10px}
+.slogan{display:none}
+.search{max-width:none;order:3;width:100%;margin-left:0}
+.btn-assine{margin-left:auto}
+.menu-toggle{display:inline-flex}
+.mainnav .inner{padding:0 12px}
+.menu{display:none;position:absolute;left:0;right:0;top:100%;background:var(--primary);flex-direction:column;align-items:stretch;padding:4px 0 12px;z-index:95;box-shadow:0 12px 24px rgba(0,0,0,.25)}
+.menu.open{display:flex}
+.menu>li>a,.menu>li>button{width:100%;justify-content:space-between;padding:14px 18px}
+.menu>li>a::after,.menu>li>button::after{display:none}
+.submenu{position:static;opacity:1;transform:none;pointer-events:auto;display:none;box-shadow:none;background:rgba(0,0,0,.18);border-radius:0}
+.menu>li.open .submenu{display:block}
+.submenu a{color:#fff;padding:10px 30px}
+.submenu a:hover{background:rgba(255,255,255,.1);color:var(--highlight)}
+.breadcrumb{padding-top:12px}
+h1.headline{font-size:32px}
+.dek{font-size:18px}
+.body{font-size:18px;line-height:1.7}
+.body p.first::first-letter{font-size:72px}
+.body h2{font-size:26px}
+blockquote.pull p{font-size:21px}
+.share-bar{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+.sbtn{flex-shrink:0}
+aside.sidebar{grid-template-columns:1fr}
+.rel-grid{grid-template-columns:1fr}
+.foot-grid{grid-template-columns:1fr}
+.nl-inner h2{font-size:26px}
+.comment-form{flex-direction:column}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="readProgress" role="progressbar" aria-label="Progresso da leitura" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+<div class="inner">
+<div class="meta">
+<span id="todayDate">Terça-feira, 3 de novembro de 2026</span>
+<span class="hide-m">São Paulo, SP</span>
+<span>25°C</span>
+</div>
+<div class="social-row" aria-label="Redes sociais do portal">
+<a class="icon-btn" href="#" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 3.9 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4 6.2 6.2 0 000-12.4zM12 16a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.9 1.4 1.4 0 000-2.9z"/></svg></a>
+<a class="icon-btn" href="#" aria-label="X (Twitter)" title="X"><svg viewBox="0 0 24 24"><path d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9.1L1 2h7l4.8 6.4L18.2 2zm-1.2 18h1.9L7.1 4H5.1l11.9 16z"/></svg></a>
+<a class="icon-btn" href="#" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 00.5 6.2 31 31 0 000 12a31 31 0 00.5 5.8 3 3 0 002.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 002.1-2.1A31 31 0 0024 12a31 31 0 00-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg></a>
+<a class="icon-btn" href="#" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v2.9h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg></a>
+<a class="icon-btn" href="#" aria-label="WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 2.9 1.1 2.9.8 3.4.7.5 0 1.7-.7 1.9-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4zM12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.1 1.6 5.9L0 24l6.3-1.6c1.7.9 3.7 1.5 5.7 1.5 6.6 0 12-5.4 12-12S18.6 0 12 0zm0 21.8c-1.8 0-3.6-.5-5.1-1.4l-.4-.2-3.7 1 1-3.6-.2-.4C2.7 15.7 2.2 13.9 2.2 12 2.2 6.6 6.6 2.2 12 2.2s9.8 4.4 9.8 9.8-4.4 9.8-9.8 9.8z"/></svg></a>
+</div>
+</div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+<div class="inner">
+<a class="logo" href="#" aria-label="Plantão Esportivo — página inicial">
+<svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+<circle cx="22" cy="22" r="21" fill="#dc2626"/>
+<path d="M10 30 L18 14 L24 24 L28 18 L34 30 Z" fill="#facc15"/>
+<rect x="6" y="32" width="32" height="4" fill="#1e3a8a"/>
+</svg>
+<div class="logo-text">PLANTÃO<br>ESPORTIVO<small>PORTAL DE ESPORTES</small></div>
+</a>
+<p class="slogan">O esporte que você ama, na velocidade que você precisa</p>
+<form class="search" id="searchForm" role="search">
+<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+<label for="searchInput" class="sr-only">Buscar no portal</label>
+<input id="searchInput" type="search" placeholder="Buscar notícias, times, atletas…" autocomplete="off">
+</form>
+<button class="btn-assine" type="button" onclick="skipUI.toast('Assinatura Plantão Premium: R$ 9,90/mês. Escolha seu plano.')">ASSINE</button>
+</div>
+</header>
+
+<!-- MAIN NAV -->
+<nav class="mainnav" aria-label="Menu principal">
+<div class="inner">
+<button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="mainMenu" aria-label="Abrir menu">
+<svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+</button>
+<ul class="menu" id="mainMenu">
+<li><a href="#">Home</a></li>
+<li class="has-sub">
+<button type="button" aria-expanded="false">Futebol <svg class="caret" viewBox="0 0 10 10"><path d="M2 3l3 3 3-3"/></svg></button>
+<ul class="submenu">
+<li><a href="#">Regional</a></li>
+<li><a href="#">Nacional</a></li>
+<li><a href="#">Internacional</a></li>
+</ul>
+</li>
+<li><a href="#">Corrida de Rua</a></li>
+<li><a href="#">Ciclismo</a></li>
+<li><a href="#">Esportes</a></li>
+<li><a href="#">Política</a></li>
+<li><a href="#">Editoriais</a></li>
+</ul>
+</div>
+</nav>
+
+<main>
+<div class="wrap">
+<nav class="breadcrumb" aria-label="Trilha de navegação">
+<a href="#">Home</a><span class="sep">›</span><a href="#">Futebol</a><span class="sep">›</span><span>Nacional</span>
+</nav>
+
+<div class="page-grid">
+<article class="article-col" id="article">
+
+<header class="reading">
+<div class="badges">
+<span class="cat-band">Futebol</span>
+<span class="seal">Análise</span>
+</div>
+<h1 class="headline">Palmeiras vira sobre o Corinthians nos acréscimos e assume a liderança do Brasileirão</h1>
+<p class="dek">Com dois gols em sete minutos, o Verdão encerra jejum de cinco anos em clássicos e chega a 62 pontos, abrindo três de vantagem na ponta.</p>
+<div class="byline">
+<span class="avatar" aria-hidden="true">RM</span>
+<span><a href="#">Ricardo Menezes</a></span>
+<span class="muted">Repórter de futebol</span>
+<span class="dot">•</span>
+<time datetime="2026-11-03T22:47">3 de novembro de 2026, 22h47</time>
+<span class="dot">•</span>
+<span>Atualizado há 12 minutos</span>
+<span class="dot">•</span>
+<span>6 min de leitura</span>
+</div>
+<div class="share-bar" role="group" aria-label="Compartilhar matéria">
+<button class="sbtn wa" type="button" data-share="wa" aria-label="Compartilhar no WhatsApp"><svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.1 1.6 5.9L0 24l6.3-1.6c1.7.9 3.7 1.5 5.7 1.5 6.6 0 12-5.4 12-12S18.6 0 12 0z"/></svg>WhatsApp</button>
+<button class="sbtn" type="button" data-share="x" aria-label="Compartilhar no X"><svg viewBox="0 0 24 24"><path d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9.1L1 2h7l4.8 6.4L18.2 2z"/></svg>X</button>
+<button class="sbtn" type="button" data-share="fb" aria-label="Compartilhar no Facebook"><svg viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v2.9h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg>Facebook</button>
+<button class="sbtn" type="button" data-share="li" aria-label="Compartilhar no LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2zM5.3 7.4a2.1 2.1 0 110-4.1 2.1 2.1 0 010 4.1zM7.1 20.5H3.6V9h3.5v11.5zM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0z"/></svg>LinkedIn</button>
+<button class="sbtn" type="button" id="copyLink" aria-label="Copiar link da matéria"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.5.5l3-3a5 5 0 00-7-7l-1.7 1.7M14 11a5 5 0 00-7.5-.5l-3 3a5 5 0 007 7l1.7-1.7"/></svg><span id="copyLabel">Copiar link</span></button>
+<button class="sbtn" type="button" id="saveBtn" aria-pressed="false" aria-label="Salvar matéria"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z" fill="none" stroke="currentColor" stroke-width="2"/></svg><span id="saveLabel">Salvar</span></button>
+</div>
+</header>
+
+<div class="hero">
+<figure style="margin:0">
+<div class="hero-img" role="img" aria-label="Ilustração em gradiente azul e vermelho com ícone de bola de futebol, representando a torcida do Palmeiras">
+<span class="cat-band hero-tag">Clássico</span>
+<div class="hero-icon">
+<svg viewBox="0 0 200 200" aria-hidden="true">
+<circle cx="100" cy="100" r="88" fill="none" stroke="#facc15" stroke-width="10"/>
+<polygon points="100,46 124,64 116,92 84,92 76,64" fill="#facc15"/>
+<polygon points="56,88 74,80 84,100 70,116 50,110" fill="#ffffff"/>
+<polygon points="144,88 126,80 116,100 130,116 150,110" fill="#ffffff"/>
+<polygon points="100,122 122,140 112,162 88,162 78,140" fill="#ffffff"/>
+</svg>
+</div>
+</div>
+<figcaption class="caption">
+<span>Torcida do Palmeiras celebra o gol da virada nos acréscimos</span>
+<span class="credit">Foto: Divulgação / Plantão Esportivo</span>
+</figcaption>
+</figure>
+</div>
+
+<div class="body" id="bodyText">
+<p class="lead first">O Palmeiras virou o placar sobre o Corinthians nos acréscimos da segunda etapa, em um Allianz Parque lotado, e assumiu a liderança isolada do Campeonato Brasileiro. Com o gol de Estêvão aos 47 minutos e o de Endrick aos 53, o Verdão reverteu a desvantagem construída pelo Corinthians em um primeiro tempo de muita marcação, e encerrou um jejum de cinco anos sem vencer o rival em clássicos disputados no estádio.</p>
+<p>Ao término de 90 minutos marcados por disputas intensas no meio-campo e poucas chances claras, a partida parecia caminhar para um empate sem gols até que a entrada de Facundo Torres, aos 31 minutos do segundo tempo, mudou o ritmo do jogo. Foi dele o cruzamento que desmontou a defesa alvinegra e abriu o caminho para a virada.</p>
+
+<h2>O jogo</h2>
+<p>O Corinthians começou melhor, com pressão alta e troca de passes rápida, e chegou ao gol aos 18 minutos com Yuri Alberto, que aproveitou sobra após chute de fora da área. O Palmeiras reagiu com paciência, equilibrou a posse no fim da primeira etapa e teve nos pés de Raphael Veiga as melhores oportunidades antes do intervalo, sem conseguir transformá-las em gols.</p>
+<p>No segundo tempo, o técnico alviverde promoveu três alterações e recuperou o controle do meio-campo. A equipe passou a ocupar o terço final com mais frequência, mas esbarrou em um goleiro que fez ao menos quatro defesas difíceis antes de falhar no lance decisivo.</p>
+
+<blockquote class="pull">
+<p>“Não é sobre o placar em um momento, é sobre o time acreditar até o último segundo. Hoje o grupo mostrou caráter e isso vale mais que três pontos.”</p>
+<footer>— Abel Ferreira, treinador do Palmeiras</footer>
+</blockquote>
+
+<h2>A virada</h2>
+<p>Aos 47 minutos, Estêvão recebeu entre dois zagueiros, girou e finalizou rasteiro no canto esquerdo para empatar o clássico. A torcida explodiu, e o Palmeiras seguiu no ataque. Seis minutos depois, em uma cobrança de escanteio que sobrou na intermediária, Endrick antecipou a marcação e chutou de primeira para decretar a virada, aos 53 minutos.</p>
+<p>Foi a primeira vez desde o campeonato de 2021 que o Palmeiras conseguiu virar um clássico paulista nos acréscimos, e o gol de Endrick marcou também sua quarta participação direta em partidas contra o Corinthians na temporada.</p>
+
+<section class="stats-box" aria-labelledby="numTitle">
+<h3 id="numTitle">NÚMEROS DO JOGO</h3>
+<div class="stats-grid">
+<div class="stat home"><div class="lbl">Posse de bola</div><div class="val">54%</div><div class="pct">Palmeiras 54% × 46% Corinthians</div><div class="bar"><i style="width:54%"></i></div></div>
+<div class="stat"><div class="lbl">Finalizações</div><div class="val">17</div><div class="pct">Palmeiras 11 × 6 Corinthians</div><div class="bar"><i style="width:65%"></i></div></div>
+<div class="stat"><div class="lbl">Chutes a gol</div><div class="val">7</div><div class="pct">Palmeiras 4 × 3 Corinthians</div><div class="bar"><i style="width:57%"></i></div></div>
+<div class="stat home"><div class="lbl">Escanteios</div><div class="val">9</div><div class="pct">Palmeiras 6 × 3 Corinthians</div><div class="bar"><i style="width:67%"></i></div></div>
+</div>
+</section>
+
+<h2>O que muda na tabela</h2>
+<p>Com os três pontos, o Palmeiras chega a 62 e abre três de vantagem sobre o Flamengo, que ainda tem uma partida a menos. O Corinthians, com 58, perde a chance de se aproximar da ponta e precisa de reação imediata para não se distanciar da zona de classificação à Libertadores.</p>
+<p>Para o restante da temporada, a equipe paulista tem a sequência mais favorável entre os líderes e pode aumentar a vantagem nas próximas quatro rodadas, que incluem os confrontos com Bahia e Fortaleza fora de casa. <a class="inlink" href="#">Veja a classificação completa</a> e acompanhe as projeções para o fim do returno.</p>
+
+<div class="video" aria-label="Vídeo: melhores momentos do clássico">
+<div class="video-frame">
+<button class="play" type="button" aria-label="Reproduzir melhores momentos do clássico" onclick="skipUI.toast('Reproduzindo melhores momentos (2:34)')"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></button>
+<span class="dur">2:34</span>
+</div>
+<div class="video-cap">Melhores momentos do clássico</div>
+</div>
+
+<h2>Próximo compromisso</h2>
+<p>Palmeiras e Corinthians voltam a se enfrentar em 14 de dezembro de 2026, pela última rodada do returno, no Neo Química Arena. Antes disso, o Verdão recebe o Vasco no domingo, 8 de novembro, e o Timão visita o Cuiabá na quarta-feira seguinte.</p>
+<div class="next-game"><strong>Próximos jogos:</strong> Palmeiras x Vasco — dom., 8/11, 16h · Cuiabá x Corinthians — qua., 11/11, 20h30.</div>
+</div>
+
+<div class="tags" aria-label="Tags da matéria">
+<a class="chip" href="#">Palmeiras</a>
+<a class="chip" href="#">Corinthians</a>
+<a class="chip" href="#">Brasileirão</a>
+<a class="chip" href="#">Clássico Paulista</a>
+<a class="chip" href="#">Virada</a>
+</div>
+
+<div class="card author-box">
+<span class="avatar-lg" aria-hidden="true">RM</span>
+<div class="author-info">
+<h3>Ricardo Menezes</h3>
+<p>Repórter de futebol há 11 anos, cobre Palmeiras e o Campeonato Brasileiro desde a Série B. Escreve sobre tática, bastidores e a rotina dos clubes paulistas.</p>
+<div class="author-actions">
+<span class="muted small"><strong>142</strong> matérias publicadas</span>
+<button class="btn" type="button" id="followBtn" aria-pressed="false">Seguir autor</button>
+<div class="author-social">
+<a class="icon-btn" href="#" aria-label="Instagram do autor"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/></svg></a>
+<a class="icon-btn" href="#" aria-label="X do autor"><svg viewBox="0 0 24 24"><path d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9.1L1 2h7l4.8 6.4L18.2 2z"/></svg></a>
+</div>
+</div>
+</div>
+</div>
+
+<section class="related" aria-labelledby="relTitle">
+<div class="sec-head">
+<div><h2 id="relTitle">Leia também</h2></div>
+<p>Mais do que está acontecendo no futebol nacional</p>
+</div>
+<div class="rel-grid">
+<a class="card rel-card" href="#">
+<div class="rel-img g1" role="img" aria-label="Gradiente azul com ícone de bola, ilustrando matéria sobre o Flamengo"><span class="cat-band">Futebol</span></div>
+<div class="rel-body"><h3>Flamengo reage no segundo tempo e vence o Fortaleza fora de casa</h3><div class="rel-meta"><span>Há 2 horas</span><span>•</span><span>👁 18,4 mil leituras</span></div></div>
+</a>
+<a class="card rel-card" href="#">
+<div class="rel-img g2" role="img" aria-label="Gradiente vermelho com ícone de troféu, ilustrando matéria sobre a Libertadores"><span class="cat-band">Internacional</span></div>
+<div class="rel-body"><h3>Libertadores: sorteio das oitavas define caminhos de Botafogo e Fluminense</h3><div class="rel-meta"><span>Há 4 horas</span><span>•</span><span>👁 12,9 mil leituras</span></div></div>
+</a>
+<a class="card rel-card" href="#">
+<div class="rel-img g3" role="img" aria-label="Gradiente verde com ícone de tênis, ilustrando matéria sobre o calendário"><span class="cat-band">Nacional</span></div>
+<div class="rel-body"><h3>Calendário da Série A 2027 é divulgado com estreia em 24 de janeiro</h3><div class="rel-meta"><span>Ontem</span><span>•</span><span>👁 9,2 mil leituras</span></div></div>
+</a>
+</div>
+</section>
+
+<section class="comments" aria-labelledby="comTitle">
+<div class="sec-head">
+<div><h2 id="comTitle">Comentários</h2></div>
+<p><span id="commentCount">24</span> comentários</p>
+</div>
+<div class="card comment-form">
+<span class="avatar" aria-hidden="true">LC</span>
+<div style="flex:1">
+<label for="commentText" class="sr-only">Escreva seu comentário</label>
+<textarea id="commentText" placeholder="O que você achou do clássico?"></textarea>
+<div class="help">Seu comentário aparece após moderação. Seja respeitoso com torcedores e jornalistas.</div>
+<div style="margin-top:10px;text-align:right"><button class="btn" type="button" id="postComment">Comentar</button></div>
+</div>
+</div>
+<div id="commentList">
+<article class="comment">
+<span class="avatar" style="background:#dc2626" aria-hidden="true">MP</span>
+<div class="comment-body">
+<div class="comment-head"><strong>Marcos Pereira</strong><span class="editor-seal">EDITOR</span><time>há 2 horas</time></div>
+<p>Virada de quem não desiste. Os últimos dez minutos foram de cair o queixo — a leitura do lance do Estêvão no empate já mostra o que foi o clássico.</p>
+<div class="comment-actions"><button type="button" onclick="skipUI.toast('Resposta aberta para Marcos Pereira')">Responder</button><button type="button" class="like" data-likes="31">Curtir · <span class="like-count">31</span></button></div>
+</div>
+</article>
+<article class="comment">
+<span class="avatar" style="background:#166534" aria-hidden="true">JA</span>
+<div class="comment-body">
+<div class="comment-head"><strong>Juliana Alves</strong><time>há 3 horas</time></div>
+<p>Esse Endrick é outro patamar. Quarta participação direta contra o Corinthians nesta temporada, e ainda vem decidindo jogo grande. Agora é segurar a ponta.</p>
+<div class="comment-actions"><button type="button" onclick="skipUI.toast('Resposta aberta para Juliana Alves')">Responder</button><button type="button" class="like" data-likes="18">Curtir · <span class="like-count">18</span></button></div>
+</div>
+</article>
+<article class="comment">
+<span class="avatar" style="background:#374151" aria-hidden="true">RS</span>
+<div class="comment-body">
+<div class="comment-head"><strong>Rafael Souza</strong><time>há 5 horas</time></div>
+<p>O Corinthians jogou bem no primeiro tempo e não aproveitou. A defesa do goleiro no segundo tempo foi o que segurou o placar por tanto tempo. Time precisa ajustar a saída de bola.</p>
+<div class="comment-actions"><button type="button" onclick="skipUI.toast('Resposta aberta para Rafael Souza')">Responder</button><button type="button" class="like" data-likes="9">Curtir · <span class="like-count">9</span></button></div>
+</div>
+</article>
+</div>
+</section>
+
+</article>
+
+<aside class="sidebar" aria-label="Conteúdo complementar">
+<section class="card widget" aria-labelledby="mrTitle">
+<h3 id="mrTitle">Mais lidas</h3>
+<p class="widget-sub">As matérias com mais leituras nas últimas 24 horas</p>
+<ol class="mostread">
+<li><span class="n">1</span><div><a href="#">Neymar confirma retorno ao Santos para a próxima temporada</a><small>14,2 mil leituras</small></div></li>
+<li><span class="n">2</span><div><a href="#">Vasco anuncia novo técnico após demissão de Pedro Caixinha</a><small>11,8 mil leituras</small></div></li>
+<li><span class="n">3</span><div><a href="#">Seleção convoca 26 jogadores para os amistosos de novembro</a><small>10,5 mil leituras</small></div></li>
+<li><span class="n">4</span><div><a href="#">Corrida de rua: recorde de inscritos marca a maratona de São Paulo</a><small>7,9 mil leituras</small></div></li>
+<li><span class="n">5</span><div><a href="#">Ciclismo: brasileiro vence etapa decisiva da Volta do Rio</a><small>6,1 mil leituras</small></div></li>
+</ol>
+</section>
+
+<section class="card widget" aria-labelledby="liveTitle">
+<div class="live-head" id="liveTitle"><span class="live-dot" aria-hidden="true"></span>PLACAR AO VIVO</div>
+<p class="widget-sub" style="margin-top:6px">Jogos em andamento agora pelo Brasileirão</p>
+<div class="scores" id="scores" tabindex="0" aria-label="Placares ao vivo, role para o lado">
+<div class="score">
+<div class="score-top"><span>Brasileirão</span><span>78'</span></div>
+<div class="team-row">
+<div class="team"><span class="shield" style="background:#1e3a8a">PAL</span>Palmeiras</div><span class="sc">2</span>
+</div>
+<div class="team-row">
+<div class="team"><span class="shield" style="background:#111827">COR</span>Corinthians</div><span class="sc">2</span>
+</div>
+</div>
+<div class="score">
+<div class="score-top"><span>Brasileirão</span><span>62'</span></div>
+<div class="team-row"><div class="team"><span class="shield" style="background:#dc2626">FLA</span>Flamengo</div><span class="sc">1</span></div>
+<div class="team-row"><div class="team"><span class="shield" style="background:#0f766e">FOR</span>Fortaleza</div><span class="sc">0</span></div>
+</div>
+<div class="score">
+<div class="score-top"><span>Brasileirão</span><span>34'</span></div>
+<div class="team-row"><div class="team"><span class="shield" style="background:#7f1d1d">BOT</span>Botafogo</div><span class="sc">0</span></div>
+<div class="team-row"><div class="team"><span class="shield" style="background:#1e40af">BAH</span>Bahia</div><span class="sc">0</span></div>
+</div>
+</div>
+<div class="scroll-nav">
+<button type="button" id="scrollPrev" aria-label="Jogo anterior">‹</button>
+<button type="button" id="scrollNext" aria-label="Próximo jogo">›</button>
+</div>
+</section>
+
+<section class="card widget" aria-labelledby="nlTitle">
+<h3 id="nlTitle">Newsletter</h3>
+<p class="widget-sub">Receba as principais notícias do dia no seu e-mail</p>
+<form id="sideNl">
+<label for="sideEmail" class="sr-only">Seu e-mail</label>
+<input class="nl-input" id="sideEmail" type="email" placeholder="seu@email.com" required>
+<button class="btn-yellow" type="submit">QUERO RECEBER</button>
+</form>
+<p class="micro">Resumo diário às 7h. Sem spam.</p>
+</section>
+
+<div class="ad">
+<div class="ad-box" role="img" aria-label="Espaço publicitário 300 por 250">Anúncio 300×250</div>
+<span class="ad-label">PUBLICIDADE</span>
+</div>
+
+<section class="card widget" aria-labelledby="followTitle">
+<h3 id="followTitle">Siga o Plantão</h3>
+<p class="widget-sub">Acompanhe os bastidores em todas as redes</p>
+<div class="follow-grid">
+<a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/></svg>Instagram</a>
+<a href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9.1L1 2h7l4.8 6.4z"/></svg>X</a>
+<a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4"/></svg>YouTube</a>
+<a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>Facebook</a>
+<a href="#" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>WhatsApp</a>
+<a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M12 2h3v13a3 3 0 11-3-3"/></svg>TikTok</a>
+<a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>LinkedIn</a>
+<a href="#" aria-label="Threads"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/></svg>Threads</a>
+</div>
+</section>
+</aside>
+</div>
+</div>
+
+<!-- Floating vertical share -->
+<div class="share-float" id="shareFloat" aria-label="Compartilhar matéria">
+<button class="icon-btn" type="button" aria-label="Compartilhar no WhatsApp" style="background:#fff;border:1px solid var(--n3);color:#15803d" data-share="wa"><svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.1 1.6 5.9L0 24l6.3-1.6c1.7.9 3.7 1.5 5.7 1.5 6.6 0 12-5.4 12-12S18.6 0 12 0z"/></svg></button>
+<button class="icon-btn" type="button" aria-label="Compartilhar no X" style="background:#fff;border:1px solid var(--n3);color:var(--n10)" data-share="x"><svg viewBox="0 0 24 24"><path d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9.1L1 2h7l4.8 6.4z"/></svg></button>
+<button class="icon-btn" type="button" aria-label="Compartilhar no Facebook" style="background:#fff;border:1px solid var(--n3);color:#1d4ed8" data-share="fb"><svg viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v2.9h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg></button>
+<button class="icon-btn" type="button" aria-label="Compartilhar no LinkedIn" style="background:#fff;border:1px solid var(--n3);color:#1e40af" data-share="li"><svg viewBox="0 0 24 24"><path d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2z"/></svg></button>
+</div>
+</main>
+
+<!-- Newsletter band -->
+<section class="nl-band" aria-labelledby="nlBandTitle">
+<div class="nl-inner">
+<div>
+<h2 id="nlBandTitle">Não perca nenhum lance</h2>
+<p>Notícias, análises e placares direto na sua caixa de entrada, todos os dias às 7h.</p>
+</div>
+<form class="nl-form" id="bandNl">
+<label for="bandEmail" class="sr-only">E-mail para assinatura</label>
+<input id="bandEmail" type="email" placeholder="Seu melhor e-mail" required>
+<button type="submit">ASSINAR GRÁTIS</button>
+</form>
+</div>
+</section>
+
+<footer class="site-footer">
+<div class="foot-grid">
+<div>
+<div class="foot-logo">PLANTÃO ESPORTIVO</div>
+<p>Cobertura diária de futebol, corrida, ciclismo e esportes olímpicos. Informação rápida, apuração séria e análise de quem acompanha o esporte de perto.</p>
+<div class="social-row">
+<a class="icon-btn" href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/></svg></a>
+<a class="icon-btn" href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9.1L1 2h7l4.8 6.4z"/></svg></a>
+<a class="icon-btn" href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4"/></svg></a>
+<a class="icon-btn" href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></a>
+<a class="icon-btn" href="#" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></a>
+</div>
+</div>
+<div>
+<h4>Categorias</h4>
+<ul>
+<li><a href="#">Futebol</a></li>
+<li><a href="#">Corrida de Rua</a></li>
+<li><a href="#">Ciclismo</a></li>
+<li><a href="#">Esportes</a></li>
+<li><a href="#">Política</a></li>
+<li><a href="#">Editoriais</a></li>
+</ul>
+</div>
+<div>
+<h4>Institucional</h4>
+<ul>
+<li><a href="#">Sobre</a></li>
+<li><a href="#">Contato</a></li>
+<li><a href="#">Política de Privacidade</a></li>
+<li><a href="#">Termos de Uso</a></li>
+<li><a href="#">Anuncie</a></li>
+<li><a href="#">Trabalhe Conosco</a></li>
+</ul>
+</div>
+<div>
+<h4>Newsletter</h4>
+<form class="foot-nl" id="footNl">
+<label for="footEmail" class="sr-only">E-mail</label>
+<input id="footEmail" type="email" placeholder="Seu e-mail" required>
+<button type="submit">ASSINAR</button>
+</form>
+</div>
+</div>
+<div class="foot-bottom">© 2026 Plantão Esportivo — Todos os direitos reservados</div>
+</footer>
+
+<!-- Search results dialog -->
+<dialog class="search-dialog" id="searchDialog" aria-labelledby="sdTitle">
+<div class="sd-head">
+<h2 id="sdTitle">Resultados da busca</h2>
+<button class="btn outline" type="button" data-dialog-close>Fechar</button>
+</div>
+<ul class="sd-list" id="sdList"></ul>
+</dialog>
+
+<button class="to-top" id="toTop" type="button" aria-label="Voltar ao topo">▲</button>
+<div class="toast-tip" id="toastTip" role="status" aria-live="polite"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Reading progress
+  const bar = document.getElementById('readProgress');
+  const article = document.getElementById('bodyText');
+  const figure = document.querySelector('.hero');
+  const shareFloat = document.getElementById('shareFloat');
+  const toTop = document.getElementById('toTop');
+
+  function onScroll() {
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? Math.min(100, (window.scrollY / max) * 100) : 0;
+    bar.style.width = pct + '%';
+    bar.setAttribute('aria-valuenow', Math.round(pct));
+    toTop.classList.toggle('show', window.scrollY > 600);
+    if (figure) {
+      const past = figure.getBoundingClientRect().bottom < 120;
+      shareFloat.classList.toggle('show', past && window.innerWidth >= 1200);
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+  toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // Toast helper
+  const tip = document.getElementById('toastTip');
+  let tipTimer;
+  function showTip(msg) {
+    tip.textContent = msg;
+    tip.classList.add('show');
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(() => tip.classList.remove('show'), 2200);
+  }
+
+  // Share buttons
+  const pageUrl = encodeURIComponent(location.href || 'https://plantaoesportivo.com.br');
+  const title = encodeURIComponent('Palmeiras vira sobre o Corinthians nos acréscimos e assume a liderança do Brasileirão');
+  document.querySelectorAll('[data-share]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const net = btn.dataset.share;
+      const urls = {
+        wa: `https://wa.me/?text=${title}%20${pageUrl}`,
+        x: `https://twitter.com/intent/tweet?text=${title}&url=${pageUrl}`,
+        fb: `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
+        li: `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`
+      };
+      window.open(urls[net], '_blank', 'noopener');
+      showTip('Abrindo compartilhamento…');
+    });
+  });
+
+  // Copy link
+  const copyBtn = document.getElementById('copyLink');
+  const copyLabel = document.getElementById('copyLabel');
+  copyBtn.addEventListener('click', () => {
+    const url = location.href;
+    const done = () => {
+      copyBtn.classList.add('copied');
+      copyLabel.textContent = 'Link copiado!';
+      setTimeout(() => {
+        copyBtn.classList.remove('copied');
+        copyLabel.textContent = 'Copiar link';
+      }, 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done, done);
+    } else {
+      done();
+    }
+  });
+
+  // Save toggle
+  const saveBtn = document.getElementById('saveBtn');
+  const saveLabel = document.getElementById('saveLabel');
+  saveBtn.addEventListener('click', () => {
+    const on = saveBtn.getAttribute('aria-pressed') !== 'true';
+    saveBtn.setAttribute('aria-pressed', on);
+    saveBtn.classList.toggle('saved', on);
+    saveLabel.textContent = on ? 'Salva' : 'Salvar';
+    showTip(on ? 'Matéria salva nos seus favoritos' : 'Matéria removida dos favoritos');
+  });
+
+  // Follow author toggle
+  const followBtn = document.getElementById('followBtn');
+  followBtn.addEventListener('click', () => {
+    const on = followBtn.getAttribute('aria-pressed') !== 'true';
+    followBtn.setAttribute('aria-pressed', on);
+    followBtn.classList.toggle('following', on);
+    followBtn.textContent = on ? 'Seguindo' : 'Seguir autor';
+    showTip(on ? 'Você passou a seguir Ricardo Menezes' : 'Deixou de seguir o autor');
+  });
+
+  // Comments
+  document.querySelectorAll('.like').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const span = btn.querySelector('.like-count');
+      const liked = btn.dataset.liked === '1';
+      let n = parseInt(span.textContent, 10);
+      n = liked ? n - 1 : n + 1;
+      span.textContent = n;
+      btn.dataset.liked = liked ? '0' : '1';
+      btn.style.color = liked ? '' : 'var(--secondary)';
+    });
+  });
+  const postBtn = document.getElementById('postComment');
+  const commentText = document.getElementById('commentText');
+  postBtn.addEventListener('click', () => {
+    const txt = commentText.value.trim();
+    if (!txt) { showTip('Escreva um comentário antes de enviar'); return; }
+    const list = document.getElementById('commentList');
+    const item = document.createElement('article');
+    item.className = 'comment';
+    const safe = txt.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    item.innerHTML = `<span class="avatar" style="background:#1e3a8a" aria-hidden="true">LC</span><div class="comment-body"><div class="comment-head"><strong>Você</strong><time>agora</time></div><p>${safe}</p><div class="comment-actions"><button type="button">Responder</button><button type="button" class="like" data-likes="0">Curtir · <span class="like-count">0</span></button></div></div>`;
+    list.prepend(item);
+    const c = document.getElementById('commentCount');
+    c.textContent = parseInt(c.textContent, 10) + 1;
+    commentText.value = '';
+    showTip('Comentário enviado para moderação');
+  });
+
+  // Mobile menu
+  const menuToggle = document.getElementById('menuToggle');
+  const menu = document.getElementById('mainMenu');
+  menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = !menu.classList.contains('open');
+    menu.classList.toggle('open', open);
+    menuToggle.setAttribute('aria-expanded', open);
+  });
+  document.querySelectorAll('.has-sub > button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const li = btn.parentElement;
+      const open = !li.classList.contains('open');
+      document.querySelectorAll('.has-sub').forEach(x => { if (x !== li) x.classList.remove('open'); });
+      li.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+    });
+  });
+  document.addEventListener('click', (e) => {
+    if (!menu.contains(e.target) && e.target !== menuToggle) {
+      menu.classList.remove('open');
+      menuToggle.setAttribute('aria-expanded', false);
+      document.querySelectorAll('.has-sub').forEach(x => x.classList.remove('open'));
+    }
+  });
+
+  // Live scores scroll
+  const scores = document.getElementById('scores');
+  document.getElementById('scrollNext').addEventListener('click', () => scores.scrollBy({ left: 240, behavior: 'smooth' }));
+  document.getElementById('scrollPrev').addEventListener('click', () => scores.scrollBy({ left: -240, behavior: 'smooth' }));
+
+  // Newsletter forms
+  function bindNl(id, msg) {
+    const f = document.getElementById(id);
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      f.reset();
+      showTip(msg);
+    });
+  }
+  bindNl('sideNl', 'Cadastro confirmado! Verifique seu e-mail.');
+  bindNl('bandNl', 'Assinatura gratuita realizada com sucesso!');
+  bindNl('footNl', 'Cadastro confirmado no resumo diário.');
+
+  // Search
+  const searchData = [
+    { t: 'Palmeiras vira sobre o Corinthians nos acréscimos', c: 'Futebol · Nacional' },
+    { t: 'Flamengo reage no segundo tempo e vence o Fortaleza', c: 'Futebol · Nacional' },
+    { t: 'Libertadores: sorteio das oitavas define caminhos', c: 'Futebol · Internacional' },
+    { t: 'Calendário da Série A 2027 é divulgado', c: 'Futebol · Nacional' },
+    { t: 'Maratona de São Paulo bate recorde de inscritos', c: 'Corrida de Rua' },
+    { t: 'Volta do Rio: brasileiro vence etapa decisiva', c: 'Ciclismo' },
+    { t: 'Seleção convoca 26 jogadores para amistosos', c: 'Futebol · Nacional' }
+  ];
+  const searchForm = document.getElementById('searchForm');
+  const sdList = document.getElementById('sdList');
+  const searchDialog = document.getElementById('searchDialog');
+  searchForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const term = document.getElementById('searchInput').value.trim().toLowerCase();
+    const res = term ? searchData.filter(r => (r.t + ' ' + r.c).toLowerCase().includes(term)) : searchData;
+    sdList.innerHTML = '';
+    if (!res.length) {
+      sdList.innerHTML = '<li class="sd-empty">Nenhum resultado para “' + term.replace(/[<>]/g,'') + '”. Tente outro termo.</li>';
+    } else {
+      res.forEach(r => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="#">${r.t}</a><small>${r.c}</small>`;
+        sdList.appendChild(li);
+      });
+    }
+    searchDialog.showModal();
+  });
+
+  // Dialog close
+  document.querySelectorAll('[data-dialog-close]').forEach(b => b.addEventListener('click', () => b.closest('dialog').close()));
+});
+</script>
+</body>
+</html>

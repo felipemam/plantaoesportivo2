@@ -1,0 +1,6 @@
+{
+  "name": "Plantão Esportivo",
+  "description": "Portal de notícias esportivo brasileiro com cobertura em tempo real de futebol, corrida de rua, ciclismo e política esportiva.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
