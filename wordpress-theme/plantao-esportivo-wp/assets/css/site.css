@@ -167,3 +167,64 @@ body.pew-site img{max-width:100%;height:auto}
  .pew-footer-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:450px){.pew-top-inner{display:block}.pew-top-inner span:last-child{display:none}.pew-footer-grid{grid-template-columns:1fr}.pew-hero{min-height:420px}.pew-row-card{grid-template-columns:100px minmax(0,1fr)}}
+
+
+/* Homepage shell rendered even without posts. Placeholders are visibly not articles. */
+.pew-home-topicbar{background:#101827;color:#dce6f4;border-bottom:3px solid var(--pew-red)}
+.pew-topicbar-inner{display:flex;align-items:center;gap:22px;min-height:65px}
+.pew-topicbar-label{display:flex;align-items:center;gap:5px;white-space:nowrap;font:900 19px/1.2 'Barlow Condensed',sans-serif;letter-spacing:.04em;color:#fff}
+.pew-topics{display:flex;align-items:center;gap:14px;overflow:auto;scrollbar-width:thin;white-space:nowrap}
+.pew-topics a,.pew-topics span{color:#cbd5e1;font-size:12px;font-weight:700;padding:4px 7px;border-radius:5px}
+.pew-topics a:hover{background:#1e3a8a;color:#fff!important}
+.pew-home .pew-section{padding-top:30px;padding-bottom:26px}
+.pew-hero-welcome{isolation:isolate}
+.pew-hero-welcome-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;
+    background:radial-gradient(circle at 75% 25%,rgba(250,204,21,.22) 0 8%,transparent 32%),
+        radial-gradient(circle at 26% 48%,rgba(220,38,38,.45) 0 11%,transparent 38%),
+        linear-gradient(122deg,#1e3a8a 0%,#10234c 56%,#101827 100%)}
+.pew-hero-welcome-art:before{content:'';position:absolute;width:340px;height:340px;border:18px solid rgba(255,255,255,.08);border-radius:50%;top:-85px;right:-90px}
+.pew-hero-welcome-art:after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(130deg,rgba(255,255,255,.025) 0 2px,transparent 2px 28px)}
+.pew-hero-welcome-art span{font:900 clamp(135px,15vw,240px)/1 'Barlow Condensed',sans-serif;color:rgba(255,255,255,.09);transform:rotate(-12deg)}
+.pew-editor-link{display:inline-block;margin-top:14px;background:var(--pew-yellow);border-radius:6px;padding:9px 14px;font-weight:800;font-size:13px;color:#172554!important}
+.pew-editor-link:hover{background:white}
+.pew-placeholder-card .pew-category{background:#eef2ff;color:var(--pew-blue)!important}
+.pew-placeholder-card h3{color:#172554}
+.pew-placeholder-card .pew-meta{color:#64748b}
+.pew-placeholder-media{display:flex;align-items:center;justify-content:center;background:
+    radial-gradient(circle at 30% 20%,rgba(250,204,21,.23),transparent 40%),
+    linear-gradient(140deg,#23458d,#101827);color:rgba(255,255,255,.4);font:900 46px/1 'Barlow Condensed',sans-serif}
+.pew-placeholder-media span{letter-spacing:-.04em}
+.pew-home-sidebar .pew-widget p{color:#475569;font-size:14px}
+.pew-sidebar-action{display:inline-block;background:var(--pew-yellow);color:#111827!important;padding:11px 13px;font-weight:800;font-size:12px;border-radius:5px}
+.pew-category-waiting{display:flex;align-items:center;gap:17px;padding:18px;background:#fff;border:1px dashed #b8c7da;border-radius:10px}
+.pew-category-waiting-symbol{display:grid;place-items:center;flex:0 0 70px;height:75px;border-radius:8px;background:linear-gradient(135deg,#1e3a8a,#111827);color:var(--pew-yellow);font:900 43px 'Barlow Condensed',sans-serif}
+.pew-category-waiting strong{color:#1e3a8a;font:800 20px 'Barlow Condensed',sans-serif;text-transform:uppercase}
+.pew-category-waiting p{color:#64748b;margin:4px 0 0;font-size:13px}
+.pew-video-placeholder{display:flex;align-items:center;justify-content:center;gap:20px;min-height:195px;padding:28px;background:linear-gradient(140deg,#111827,#1e3a8a);color:white;border-radius:10px}
+.pew-video-placeholder>span{display:grid;place-items:center;flex:0 0 62px;width:62px;height:62px;border-radius:50%;background:var(--pew-red);font-size:23px}
+.pew-video-placeholder strong{font:900 27px 'Barlow Condensed',sans-serif;text-transform:uppercase}
+.pew-video-placeholder p{margin:4px 0 0;color:#cbd5e1;font-size:13px}
+.pew-home-newsletter{margin:18px 0 0;background:
+    linear-gradient(112deg,#1e3a8a 0%,#1e3a8a 72%,#dc2626 72%,#dc2626 100%);
+    color:white}
+.pew-newsletter-inner{display:grid;grid-template-columns:1.5fr 1fr;align-items:center;gap:35px;padding:44px 0}
+.pew-newsletter-eyebrow{color:var(--pew-yellow);font-size:12px;letter-spacing:.09em;font-weight:900}
+.pew-newsletter-inner h2{font:900 36px/1.1 'Barlow Condensed',sans-serif;text-transform:uppercase;margin:7px 0}
+.pew-newsletter-inner p{color:#e2e8f0;margin:0;font-size:14px}
+.pew-newsletter-content a{display:inline-block;background:var(--pew-yellow);color:#111827!important;border-radius:8px;padding:14px 18px;text-align:center;font-weight:800}
+.pew-newsletter-content a:hover{background:#fff}
+.pew-newsletter-content form{max-width:100%}
+.pew-newsletter-content input{max-width:100%}
+@media(max-width:900px){
+ .pew-topicbar-inner{gap:12px}
+ .pew-topics{gap:5px}
+ .pew-newsletter-inner{grid-template-columns:1fr;gap:15px}
+}
+@media(max-width:600px){
+ .pew-home-topicbar{padding:7px 0}
+ .pew-topicbar-inner{display:block}
+ .pew-topicbar-label{font-size:17px;margin-bottom:6px}
+ .pew-category-waiting-symbol{flex-basis:52px;height:60px;font-size:32px}
+ .pew-newsletter-inner h2{font-size:28px}
+ .pew-home-newsletter{background:#1e3a8a}
+}
