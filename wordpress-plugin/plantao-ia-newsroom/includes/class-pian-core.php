@@ -20,6 +20,8 @@ final class PIAN_Core {
 
         if (is_admin()) {
             PIAN_Admin::boot();
+            PIAN_Sources::boot();
+            PIAN_Editor::boot();
         }
     }
 
