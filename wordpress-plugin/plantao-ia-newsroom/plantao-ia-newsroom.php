@@ -21,6 +21,8 @@ define('PIAN_PLUGIN_DIR', plugin_dir_path(__FILE__));
 require_once PIAN_PLUGIN_DIR . 'includes/class-pian-core.php';
 require_once PIAN_PLUGIN_DIR . 'includes/class-pian-ai.php';
 require_once PIAN_PLUGIN_DIR . 'includes/class-pian-admin.php';
+require_once PIAN_PLUGIN_DIR . 'includes/class-pian-sources.php';
+require_once PIAN_PLUGIN_DIR . 'includes/class-pian-editor.php';
 
 register_activation_hook(__FILE__, array('PIAN_Core', 'activate'));
 register_deactivation_hook(__FILE__, array('PIAN_Core', 'deactivate'));
