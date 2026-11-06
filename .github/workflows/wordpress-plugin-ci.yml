@@ -1,0 +1,43 @@
+name: Plantão IA Newsroom — PHP lint and plugin ZIP
+
+on:
+  push:
+    paths:
+      - 'wordpress-plugin/**'
+      - '.github/workflows/wordpress-plugin-ci.yml'
+  pull_request:
+    paths:
+      - 'wordpress-plugin/**'
+      - '.github/workflows/wordpress-plugin-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  lint-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check PHP syntax
+        run: |
+          set -eu
+          find wordpress-plugin/plantao-ia-newsroom -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Check plugin structure
+        run: |
+          set -eu
+          test -f wordpress-plugin/plantao-ia-newsroom/plantao-ia-newsroom.php
+          test -f wordpress-plugin/plantao-ia-newsroom/includes/class-pian-core.php
+          test -f wordpress-plugin/plantao-ia-newsroom/includes/class-pian-admin.php
+          test -f wordpress-plugin/plantao-ia-newsroom/includes/class-pian-sources.php
+          test -f wordpress-plugin/plantao-ia-newsroom/includes/class-pian-editor.php
+          test -f wordpress-plugin/plantao-ia-newsroom/includes/class-pian-ai.php
+      - name: Build installable WordPress plugin ZIP
+        run: |
+          set -eu
+          cd wordpress-plugin
+          zip -qr ../plantao-ia-newsroom.zip plantao-ia-newsroom
+          unzip -l ../plantao-ia-newsroom.zip
+      - name: Upload ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantao-ia-newsroom-wordpress-plugin
+          path: plantao-ia-newsroom.zip
+          retention-days: 14
