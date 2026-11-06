@@ -334,29 +334,57 @@ final class PIAN_Core {
     }
 
     /**
-     * No editor clássico, uma pauta sem aprovação fica pendente, nunca publicada.
+     * Uma pauta só pode ser publicada depois da revisão, com texto e título próprios.
+     */
+    private static function ready_to_publish(int $post_id, string $title, string $content): bool {
+        return get_post_meta($post_id, '_pian_editorial_approved', true) === '1'
+            && !str_starts_with(trim($title), '[Pauta]')
+            && trim(wp_strip_all_tags($content)) !== '';
+    }
+
+    /**
+     * Editor clássico, importadores e APIs legadas: impede publicação e agendamento.
      */
     public static function guard_post_status(array $data, array $postarr): array {
         $post_id = (int) ($postarr['ID'] ?? 0);
-        if ($post_id && ($data['post_status'] ?? '') === 'publish' &&
+        if ($post_id && in_array($data['post_status'] ?? '', array('publish', 'future', 'private'), true) &&
             get_post_meta($post_id, '_pian_source_id', true) &&
-            get_post_meta($post_id, '_pian_editorial_approved', true) !== '1') {
+            !self::ready_to_publish($post_id, (string) ($data['post_title'] ?? ''), (string) ($data['post_content'] ?? ''))) {
             $data['post_status'] = 'pending';
         }
         return $data;
     }
 
     /**
-     * No editor de blocos, devolve erro claro antes da tentativa de publicação.
+     * Editor de blocos: erro explícito se tentar publicar pauta não pronta.
      */
     public static function guard_rest_publish($prepared_post, $request) {
+        if (is_wp_error($prepared_post)) {
+            return $prepared_post;
+        }
         $post_id = (int) $request->get_param('id');
-        if ($post_id && $request->get_param('status') === 'publish' &&
-            get_post_meta($post_id, '_pian_source_id', true) &&
-            get_post_meta($post_id, '_pian_editorial_approved', true) !== '1') {
+        if (!$post_id || !in_array($request->get_param('status'), array('publish', 'future', 'private'), true) ||
+            !get_post_meta($post_id, '_pian_source_id', true)) {
+            return $prepared_post;
+        }
+        $title = $request->get_param('title');
+        $content = $request->get_param('content');
+        if (is_array($title)) {
+            $title = $title['raw'] ?? $title['rendered'] ?? '';
+        }
+        if (is_array($content)) {
+            $content = $content['raw'] ?? $content['rendered'] ?? '';
+        }
+        if (!is_string($title)) {
+            $title = (string) get_post_field('post_title', $post_id);
+        }
+        if (!is_string($content)) {
+            $content = (string) get_post_field('post_content', $post_id);
+        }
+        if (!self::ready_to_publish($post_id, $title, $content)) {
             return new WP_Error(
                 'pian_review_required',
-                'Esta pauta exige aprovação editorial em Plantão IA antes da publicação.',
+                'Antes de publicar: altere o título [Pauta], escreva texto original e confirme a apuração no painel Plantão IA.',
                 array('status' => 403)
             );
         }
