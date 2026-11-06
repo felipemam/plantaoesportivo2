@@ -59,6 +59,10 @@ final class PIAN_Editor {
             $user = $reviewer ? get_userdata($reviewer) : false;
             echo '<p><strong>Aprovação editorial registrada</strong>' . ($user ? ' por ' . esc_html($user->display_name) : '') . '.</p>';
         } elseif (current_user_can('publish_posts') && current_user_can('edit_post', $post->ID)) {
+            if (str_starts_with(trim($post->post_title), '[Pauta]') || trim(wp_strip_all_tags($post->post_content)) === '') {
+                echo '<p><strong>Antes de aprovar:</strong> salve um título sem [Pauta] e o texto original da matéria.</p>';
+                return;
+            }
             $approve_url = wp_nonce_url(
                 admin_url('admin-post.php?action=pian_approve&post_id=' . $post->ID),
                 'pian_approve_' . $post->ID
@@ -87,6 +91,13 @@ final class PIAN_Editor {
         self::authorize($post_id, 'pian_approve_' . $post_id);
         if (!current_user_can('publish_posts')) {
             wp_die('Aprovação reservada a editores com permissão de publicar.', '', array('response' => 403));
+        }
+        $post = get_post($post_id);
+        if (!$post || str_starts_with(trim($post->post_title), '[Pauta]') || trim(wp_strip_all_tags($post->post_content)) === '') {
+            wp_die('Salve um título definitivo e texto original antes de aprovar.', '', array('response' => 400));
+        }
+        if ((int) $post->post_author === 0) {
+            wp_update_post(array('ID' => $post_id, 'post_author' => get_current_user_id()));
         }
         update_post_meta($post_id, '_pian_editorial_approved', '1');
         update_post_meta($post_id, '_pian_reviewed_by', get_current_user_id());
