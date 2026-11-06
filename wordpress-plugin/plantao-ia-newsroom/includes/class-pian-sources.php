@@ -69,7 +69,7 @@ final class PIAN_Sources {
         echo '</tbody></table>';
         submit_button('Cadastrar fonte');
         echo '</form><h2>Buscar pautas agora</h2>';
-        echo '<p>Até 30 itens por execução; WP-Cron a cada 15 minutos (dependente de visitas ou cron real).</p>';
+        echo '<p>Até 30 pautas novas por execução; WP-Cron a cada 15 minutos (dependente de visitas ou cron real).</p>';
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
         echo '<input type="hidden" name="action" value="pian_sync_now">';
         wp_nonce_field('pian_sync_now');
