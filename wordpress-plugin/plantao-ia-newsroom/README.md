@@ -5,7 +5,7 @@ Plugin WordPress **independente do tema** Plantão Esportivo. Primeira versão d
 ## O que está implementado
 
 - Menu **Plantão IA > Fontes RSS**: até 8 fontes HTTPS públicas, ativação/pausa/remoção, categoria e limite de 1 a 10 itens por fonte.
-- **Sincronização manual** e **WP-Cron a cada 15 minutos**, com trava de execução, limite global de 30 itens e filtro de notícias com mais de 7 dias.
+- **Sincronização manual** e **WP-Cron a cada 15 minutos**, com trava de execução, limite global de 30 novas pautas e filtro de notícias com mais de 7 dias.
 - **Deduplicação** por URL normalizada (sem parâmetros de rastreamento) ou GUID, com índice único em tabela própria do banco.
 - Criação de **posts nativos do WordPress como rascunho**, com título iniciado por [Pauta] e corpo vazio. Resumo curto, link e nome da fonte ficam em metadados privados.
 - **Fila editorial** (50 pautas recentes), painel de apuração dentro do editor e histórico administrativo dos últimos 100 eventos.
