@@ -93,7 +93,7 @@ final class PIAN_Core {
     }
 
     /**
-     * Sincroniza até 30 itens por execução, com trava entre cron e ações manuais.
+     * Cria até 30 novas pautas por execução, com trava entre cron e ações manuais.
      */
     public static function sync_all(): array {
         $summary = array(
@@ -122,7 +122,7 @@ final class PIAN_Core {
                 if (empty($source['active'])) {
                     continue;
                 }
-                $remaining = 30 - $summary['created'] - $summary['duplicates'];
+                $remaining = 30 - $summary['created'];
                 if ($remaining <= 0) {
                     break;
                 }
