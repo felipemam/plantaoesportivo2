@@ -1,29 +1,26 @@
 import React, { useState } from 'react';
-import { Search, Menu, X, ChevronDown, Bookmark, Cloud, CheckCircle2 } from 'lucide-react';
+import { Search, Menu, X, ChevronDown } from 'lucide-react';
 import { User } from 'firebase/auth';
+import { Logo } from './Logo';
 
 interface HeaderProps {
   currentCategory: string;
   onSelectCategory: (category: string, subcategory?: string) => void;
   onOpenSearch: () => void;
-  onOpenSubscribe: () => void;
-  onOpenSaved: () => void;
-  savedCount: number;
-  user: User | null;
-  hasDriveToken: boolean;
-  onOpenDriveModal: () => void;
+  onOpenSubscribe?: () => void;
+  onOpenSaved?: () => void;
+  savedCount?: number;
+  user?: User | null;
+  hasDriveToken?: boolean;
+  onOpenDriveModal?: () => void;
+  onOpenCreateArticle?: () => void;
+  onOpenAdModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   currentCategory,
   onSelectCategory,
-  onOpenSearch,
-  onOpenSubscribe,
-  onOpenSaved,
-  savedCount,
-  user,
-  hasDriveToken,
-  onOpenDriveModal
+  onOpenSearch
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [futebolSubmenuOpen, setFutebolSubmenuOpen] = useState(false);
@@ -62,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       {/* TOPBAR */}
-      <div className="bg-[#1e3a8a] text-[#dbe4ff] text-xs py-2 px-4 border-b border-[#172554]">
+      <div className="bg-[#1e3a8a] dark:bg-[#090d16] text-[#dbe4ff] text-xs py-2 px-4 border-b border-[#172554] dark:border-gray-800 transition-colors">
         <div className="max-w-[1240px] mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="font-medium text-white">{capitalizedDate}</span>
@@ -72,44 +69,10 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="w-2 h-2 rounded-full bg-[#facc15] inline-block"></span>
               25°C
             </span>
-            <span className="hidden md:inline-flex items-center gap-1.5 ml-2 px-2 py-0.5 rounded bg-blue-900/60 text-[11px] text-blue-200 border border-blue-700/50">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
-              TEMPO REAL ATIVO
-            </span>
           </div>
 
+          {/* Social Links */}
           <div className="flex items-center gap-3">
-            {/* Google Drive & Cloud Sync Shortcut */}
-            <button
-              onClick={onOpenDriveModal}
-              className="inline-flex items-center gap-1.5 text-blue-100 hover:text-[#facc15] transition-colors cursor-pointer text-xs font-semibold px-2.5 py-1 rounded bg-blue-900/50 hover:bg-blue-900/80 border border-blue-700/60"
-              title="Abrir Central Google Drive e Sincronização na Nuvem"
-            >
-              <Cloud className="w-3.5 h-3.5 text-[#facc15]" />
-              <span>Google Drive</span>
-              {user && hasDriveToken && (
-                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-              )}
-            </button>
-
-            {/* Saved Articles Shortcut */}
-            <button
-              onClick={onOpenSaved}
-              className="inline-flex items-center gap-1.5 text-blue-100 hover:text-[#facc15] transition-colors cursor-pointer text-xs font-semibold px-2 py-1 rounded hover:bg-blue-900/40"
-              title="Ver matérias salvas"
-            >
-              <Bookmark className="w-3.5 h-3.5 text-[#facc15]" />
-              <span>Salvas</span>
-              {savedCount > 0 && (
-                <span className="bg-[#dc2626] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">
-                  {savedCount}
-                </span>
-              )}
-            </button>
-
-            <span className="text-blue-400">|</span>
-
-            {/* Social Links */}
             <div className="flex items-center gap-2">
               <a
                 href="#facebook"
@@ -157,71 +120,45 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* MAIN HEADER */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-xs">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40 shadow-xs transition-colors">
         <div className="max-w-[1240px] mx-auto px-4 h-20 flex items-center justify-between gap-4">
-          {/* Logo & Slogan */}
+          {/* Logo & Slogan (Automatically switches between Light and Dark Logo) */}
           <button
             onClick={() => handleNavClick('Home')}
-            className="flex items-center gap-3 text-left cursor-pointer group"
+            className="text-left cursor-pointer group focus:outline-none"
           >
-            {/* Sport Emblem */}
-            <div className="relative w-11 h-11 rounded-full bg-[#1e3a8a] flex items-center justify-center border-2 border-[#dc2626] shadow-sm group-hover:scale-105 transition-transform shrink-0">
-              <svg className="w-6 h-6" viewBox="0 0 40 40" aria-hidden="true">
-                <path
-                  d="M20 6 L23 17 L34 17 L25 23.5 L28.5 34 L20 27.5 L11.5 34 L15 23.5 L6 17 L17 17 Z"
-                  fill="#facc15"
-                />
-              </svg>
-              <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#dc2626] border border-white flex items-center justify-center">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#facc15]"></span>
-              </span>
-            </div>
-
-            <div>
-              <div className="font-condensed font-black text-2xl sm:text-[28px] tracking-tight text-[#1e3a8a] leading-none uppercase">
-                Plantão <span className="text-[#dc2626]">Esportivo</span>
-              </div>
-              <div className="text-[11px] sm:text-xs text-gray-500 font-medium tracking-normal mt-0.5 line-clamp-1 max-w-[280px]">
-                O esporte que você ama, na velocidade que você precisa
-              </div>
-            </div>
+            <Logo variant="auto" size="md" />
           </button>
 
           {/* Search Bar (Desktop) */}
-          <div className="hidden md:flex flex-1 max-w-sm mx-4">
+          <div className="hidden md:flex flex-1 max-w-md ml-auto">
             <button
               onClick={onOpenSearch}
-              className="w-full h-10 px-4 pl-10 bg-gray-50 hover:bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-500 flex items-center justify-between transition-colors cursor-pointer text-left relative focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+              className="w-full h-10 px-4 pl-10 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-500 dark:text-gray-300 flex items-center justify-between transition-colors cursor-pointer text-left relative focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] dark:focus:ring-blue-500"
             >
               <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
               <span>Buscar notícias, times, atletas…</span>
-              <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-white border border-gray-200 rounded text-gray-400">
+              <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-gray-400 dark:text-gray-300">
                 /
               </kbd>
             </button>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3">
+          {/* Mobile search & menu */}
+          <div className="flex md:hidden items-center gap-2">
+            {/* Search (Mobile) */}
             <button
               onClick={onOpenSearch}
-              className="md:hidden p-2 text-gray-600 hover:text-[#1e3a8a] hover:bg-gray-100 rounded-lg cursor-pointer"
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-[#1e3a8a] dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
               aria-label="Buscar"
             >
               <Search className="w-5 h-5" />
             </button>
 
-            <button
-              onClick={onOpenSubscribe}
-              className="hidden sm:inline-flex items-center gap-1.5 bg-[#facc15] hover:bg-[#eab308] text-gray-900 font-condensed font-black text-base px-5 py-2 rounded-lg shadow-sm hover:shadow transition-all uppercase tracking-wide cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
-            >
-              Assine
-            </button>
-
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-700 hover:text-[#1e3a8a] rounded-lg cursor-pointer"
+              className="p-2 text-gray-700 dark:text-gray-200 hover:text-[#1e3a8a] rounded-lg cursor-pointer"
               aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -231,7 +168,7 @@ export const Header: React.FC<HeaderProps> = ({
       </header>
 
       {/* DESKTOP NAVIGATION MENU */}
-      <nav className="hidden md:block bg-[#1e3a8a] text-white shadow-md relative z-30">
+      <nav className="hidden md:block bg-[#1e3a8a] dark:bg-[#0c1322] text-white shadow-md relative z-30 border-b border-blue-900/60 dark:border-gray-800 transition-colors">
         <div className="max-w-[1240px] mx-auto px-4">
           <ul className="flex items-center h-12 gap-1 font-condensed text-base font-bold uppercase tracking-wider">
             {categories.map((cat) => {
@@ -267,12 +204,12 @@ export const Header: React.FC<HeaderProps> = ({
 
                     {/* Submenu Dropdown */}
                     {futebolSubmenuOpen && (
-                      <div className="absolute top-12 left-0 w-48 bg-white text-gray-900 rounded-b-lg shadow-xl border border-gray-200 py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                      <div className="absolute top-12 left-0 w-48 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-b-lg shadow-xl border border-gray-200 dark:border-gray-800 py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
                         {cat.subcategories?.map((sub) => (
                           <button
                             key={sub}
                             onClick={() => handleNavClick(cat.name, sub)}
-                            className="w-full text-left px-4 py-2.5 text-sm font-sans font-semibold text-gray-700 hover:bg-blue-50 hover:text-[#1e3a8a] transition-colors cursor-pointer flex items-center justify-between"
+                            className="w-full text-left px-4 py-2.5 text-sm font-sans font-semibold text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-[#1e3a8a] dark:hover:text-[#facc15] transition-colors cursor-pointer flex items-center justify-between"
                           >
                             <span>{sub}</span>
                             <span className="text-xs text-gray-400 font-normal">Futebol</span>
@@ -306,8 +243,8 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* MOBILE NAVIGATION DRAWER */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#1e3a8a] text-white border-t border-blue-800 shadow-xl z-50 px-4 py-3 animate-in slide-in-from-top duration-200">
-          <ul className="flex flex-col divide-y divide-blue-800/60 font-condensed text-lg font-bold uppercase tracking-wider">
+        <div className="md:hidden bg-[#1e3a8a] dark:bg-[#0c1322] text-white border-t border-blue-800 dark:border-gray-800 shadow-xl z-50 px-4 py-3 animate-in slide-in-from-top duration-200">
+          <ul className="flex flex-col divide-y divide-blue-800/60 dark:divide-gray-800 font-condensed text-lg font-bold uppercase tracking-wider">
             <li>
               <button
                 onClick={() => handleNavClick('Home')}
@@ -390,18 +327,6 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </li>
           </ul>
-
-          <div className="mt-4 pt-3 border-t border-blue-800 flex items-center justify-between">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenSubscribe();
-              }}
-              className="w-full bg-[#facc15] text-gray-900 font-condensed font-black text-lg py-2.5 rounded-lg text-center uppercase"
-            >
-              Assinar Plantão Premium
-            </button>
-          </div>
         </div>
       )}
     </>

@@ -20,11 +20,12 @@ import { LiveScoreTicker } from './components/LiveScoreTicker';
 import { HeroCarousel } from './components/HeroCarousel';
 import { LatestNewsGrid } from './components/LatestNewsGrid';
 import { CategoryBlockSection } from './components/CategoryBlockSection';
-import { VideosSection } from './components/VideosSection';
-import { EditorialsSection } from './components/EditorialsSection';
+import { CategoryView } from './components/CategoryView';
 import { NewsletterBand } from './components/NewsletterBand';
 import { Footer } from './components/Footer';
 import { ArticleView } from './components/ArticleView';
+import { LeaderboardAd, AdInfoModal } from './components/AdBanners';
+import { CreateArticleModal } from './components/CreateArticleModal';
 import {
   SearchModal,
   SubscriptionModal,
@@ -43,13 +44,31 @@ import {
   removeBookmarkFromCloud,
   subscribeToUserBookmarks,
   subscribeToUserDriveExports,
+  saveArticleToFirestore,
   CloudDriveExport
 } from './services/firebase';
+import { getWordPressConfig, fetchArticlesFromWordPress } from './services/wordpress';
 
 export default function App() {
+  // Articles state with localStorage synchronization
+  const [articles, setArticles] = useState<Article[]>(() => {
+    try {
+      const saved = localStorage.getItem('plantao_custom_articles');
+      if (saved) {
+        const parsed: Article[] = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return [...parsed, ...INITIAL_ARTICLES];
+        }
+      }
+    } catch {
+      // fallback to INITIAL_ARTICLES
+    }
+    return INITIAL_ARTICLES;
+  });
+
   // Navigation State
-  const [currentView, setCurrentView] = useState<'home' | 'article'>('home');
-  const [selectedArticle, setSelectedArticle] = useState<Article>(INITIAL_ARTICLES[0]);
+  const [currentView, setCurrentView] = useState<'home' | 'category' | 'article'>('home');
+  const [selectedArticle, setSelectedArticle] = useState<Article>(() => articles[0] || INITIAL_ARTICLES[0]);
   const [currentCategory, setCurrentCategory] = useState<string>('Home');
   const [currentSubcategory, setCurrentSubcategory] = useState<string | undefined>();
   const [newsFilter, setNewsFilter] = useState<string>('Todas');
@@ -82,6 +101,11 @@ export default function App() {
   const [isStandingsOpen, setIsStandingsOpen] = useState(false);
   const [isSavedOpen, setIsSavedOpen] = useState(false);
   const [institutionalData, setInstitutionalData] = useState<{ title: string; content: string } | null>(null);
+
+  // Ad Info & Create Article Modals
+  const [isAdModalOpen, setIsAdModalOpen] = useState(false);
+  const [isCreateArticleOpen, setIsCreateArticleOpen] = useState(false);
+  const [createArticleDefaultCat, setCreateArticleDefaultCat] = useState('Futebol');
 
   // Toast Notification state
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error'; visible: boolean }>({
@@ -153,49 +177,43 @@ export default function App() {
     };
   }, []);
 
+  // Handlers for Login & Logout
   const handleGoogleLogin = async () => {
     try {
-      const result = await googleSignIn();
-      if (result) {
-        setUser(result.user);
-        setHasDriveToken(true);
-        showToast('Conta Google e Google Drive conectados com sucesso!', 'success');
-      }
+      await googleSignIn();
+      showToast('Login com Google realizado com sucesso!', 'success');
     } catch {
-      showToast('Não foi possível concluir o login com o Google.', 'error');
+      showToast('Não foi possível autenticar com o Google.', 'error');
     }
   };
 
   const handleLogout = async () => {
-    await logout();
-    setUser(null);
-    setHasDriveToken(false);
-    showToast('Conta Google desconectada.', 'success');
+    try {
+      await logout();
+      showToast('Você encerrou a sessão com sucesso.', 'success');
+    } catch {
+      showToast('Erro ao encerrar sessão.', 'error');
+    }
   };
 
-  // Toggle Save Article (Local + Firestore Cloud Sync)
+  // Handlers for Saving Articles (Bookmarks)
   const handleToggleSave = async (article: Article) => {
+    const isAlreadySaved = savedArticleIds.includes(article.id);
     let updated: string[];
-    const isCurrentlySaved = savedArticleIds.includes(article.id);
 
-    if (isCurrentlySaved) {
+    if (isAlreadySaved) {
       updated = savedArticleIds.filter((id) => id !== article.id);
-      showToast('Matéria removida dos seus favoritos.', 'success');
+      showToast('Matéria removida dos itens salvos.', 'success');
       if (user) {
         try {
           await removeBookmarkFromCloud(user, article.id);
         } catch {
-          // Handled by handleFirestoreError
+          // Handled gracefully
         }
       }
     } else {
-      updated = [...savedArticleIds, article.id];
-      showToast(
-        user
-          ? 'Matéria salva nos favoritos e sincronizada no Firebase Cloud!'
-          : 'Matéria salva nos seus favoritos!',
-        'success'
-      );
+      updated = [article.id, ...savedArticleIds];
+      showToast('Matéria salva para leitura offline e backup.', 'success');
       if (user) {
         try {
           await saveBookmarkToCloud(user, {
@@ -204,7 +222,7 @@ export default function App() {
             category: article.category
           });
         } catch {
-          // Handled by handleFirestoreError
+          // Handled gracefully
         }
       }
     }
@@ -229,11 +247,92 @@ export default function App() {
       try {
         await removeBookmarkFromCloud(user, articleId);
       } catch {
-        // Handled by handleFirestoreError
+        // Handled gracefully
       }
     }
     showToast('Matéria removida dos salvos.', 'success');
   };
+
+  // Create Article & Category Synchronization
+  const handleOpenCreateArticle = (category?: string) => {
+    setCreateArticleDefaultCat(category || (currentCategory !== 'Home' ? currentCategory : 'Futebol'));
+    setIsCreateArticleOpen(true);
+  };
+
+  const handleSaveNewArticle = async (newArticle: Article) => {
+    // 1. Prepend to in-memory articles state
+    setArticles((prev) => [newArticle, ...prev]);
+
+    // 2. Persist to localStorage
+    try {
+      const saved = localStorage.getItem('plantao_custom_articles');
+      const parsed: Article[] = saved ? JSON.parse(saved) : [];
+      localStorage.setItem('plantao_custom_articles', JSON.stringify([newArticle, ...parsed]));
+    } catch (e) {
+      console.warn('LocalStorage save failed:', e);
+    }
+
+    // 3. Persist to Firebase Firestore collection '/articles'
+    saveArticleToFirestore({
+      id: newArticle.id,
+      title: newArticle.title,
+      category: newArticle.category,
+      subcategory: newArticle.subcategory,
+      author: newArticle.author,
+      dek: newArticle.dek,
+      paragraphs: newArticle.content.filter((c) => c.type === 'paragraph').map((c) => c.text || ''),
+      publishedAt: newArticle.publishedAt
+    });
+
+    // 4. Navigate directly to the new article for preview
+    setSelectedArticle(newArticle);
+    setCurrentCategory(newArticle.category);
+    setCurrentView('article');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    showToast(
+      `Notícia do WordPress publicada e sincronizada na editoria ${newArticle.category}!`,
+      'success'
+    );
+  };
+
+  const handleSyncWordPressBatch = (wpArticles: Article[]) => {
+    setArticles((prev) => {
+      const existingIds = new Set(prev.map((a) => a.id));
+      const newOnes = wpArticles.filter((a) => !existingIds.has(a.id));
+      const merged = [...newOnes, ...prev];
+      try {
+        const customOnly = merged.filter(
+          (a) => !INITIAL_ARTICLES.some((init) => init.id === a.id)
+        );
+        localStorage.setItem('plantao_custom_articles', JSON.stringify(customOnly));
+      } catch {
+        // ignore
+      }
+      return merged;
+    });
+
+    showToast(
+      `${wpArticles.length} matérias sincronizadas do WordPress com as categorias!`,
+      'success'
+    );
+  };
+
+  // Automatic WordPress background synchronization if configured
+  useEffect(() => {
+    const cfg = getWordPressConfig();
+    if (cfg.siteUrl && cfg.autoSync) {
+      fetchArticlesFromWordPress(cfg.siteUrl)
+        .then((wpArticles) => {
+          if (wpArticles.length > 0) {
+            handleSyncWordPressBatch(wpArticles);
+          }
+        })
+        .catch(() => {
+          // Silent background check if offline or unconfigured
+        });
+    }
+  }, []);
 
   // Live match clock & simulation tick
   const simulateLiveTick = () => {
@@ -241,12 +340,10 @@ export default function App() {
       return prevMatches.map((m) => {
         if (!m.isLive) return m;
 
-        // Extract numeric minute if possible
         const minNum = parseInt(m.minute.replace("'", ''), 10);
         if (isNaN(minNum)) return m;
 
         const nextMin = minNum + 1;
-        // Occasionally trigger a goal or event
         if (m.id === 'm1' && nextMin === 80) {
           showToast(`⚡ TEMPO REAL: Quase o terceiro do Palmeiras no Allianz Parque!`, 'success');
         }
@@ -279,50 +376,53 @@ export default function App() {
   const handleSelectCategory = (catName: string, sub?: string) => {
     setCurrentCategory(catName);
     setCurrentSubcategory(sub);
-    setCurrentView('home');
 
     if (catName === 'Home') {
+      setCurrentView('home');
       setNewsFilter('Todas');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      setNewsFilter(catName);
-      // Smoothly scroll down to the content area
-      setTimeout(() => {
-        const target = document.getElementById('latest-title') || document.body;
-        target.scrollIntoView({ behavior: 'smooth' });
-      }, 50);
+      setCurrentView('category');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleBackToHome = () => {
+    setCurrentCategory('Home');
+    setCurrentSubcategory(undefined);
     setCurrentView('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const savedArticlesList = INITIAL_ARTICLES.filter((a) => savedArticleIds.includes(a.id));
+  const handleBackFromArticle = () => {
+    if (currentCategory && currentCategory !== 'Home') {
+      setCurrentView('category');
+    } else {
+      setCurrentView('home');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const savedArticlesList = articles.filter((a) => savedArticleIds.includes(a.id));
 
   // Hero carousel articles: lead 3 stories
-  const heroSlideArticles = INITIAL_ARTICLES.slice(0, 3);
+  const heroSlideArticles = articles.slice(0, 3);
   // Hero side articles: next 3 stories
   const heroSideArticles = [
-    INITIAL_ARTICLES.find((a) => a.id === 'politica-clubes-empresa') || INITIAL_ARTICLES[3],
-    INITIAL_ARTICLES.find((a) => a.id === 'selecao-convocacao-novembro') || INITIAL_ARTICLES[4],
-    INITIAL_ARTICLES.find((a) => a.id === 'editorial-preco-ingressos') || INITIAL_ARTICLES[5]
+    articles.find((a) => a.id === 'politica-clubes-empresa') || articles[3] || articles[0],
+    articles.find((a) => a.id === 'selecao-convocacao-novembro') || articles[4] || articles[1],
+    articles.find((a) => a.id === 'editorial-preco-ingressos') || articles[5] || articles[2]
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8f9fb] text-[#111827]">
+    <div className="min-h-screen flex flex-col bg-[#f8f9fb] dark:bg-[#0b0f19] text-[#111827] dark:text-[#f9fafb] transition-colors">
       {/* 1. Portal Header */}
       <Header
         currentCategory={currentCategory}
         onSelectCategory={handleSelectCategory}
         onOpenSearch={() => setIsSearchOpen(true)}
-        onOpenSubscribe={() => setIsSubscribeOpen(true)}
-        onOpenSaved={() => setIsSavedOpen(true)}
-        savedCount={savedArticleIds.length}
-        user={user}
-        hasDriveToken={hasDriveToken}
-        onOpenDriveModal={() => setIsDriveModalOpen(true)}
+        onOpenCreateArticle={() => handleOpenCreateArticle()}
+        onOpenAdModal={() => setIsAdModalOpen(true)}
       />
 
       {/* 2. Live Scores Ticker */}
@@ -342,32 +442,13 @@ export default function App() {
         }}
       />
 
-      {/* 3. Main Views */}
+      {/* 3. Top Leaderboard Banner (IAB 728x90) */}
+      <LeaderboardAd onOpenAdModal={() => setIsAdModalOpen(true)} />
+
+      {/* 4. Main Views */}
       <main className="flex-1">
         {currentView === 'home' ? (
           <>
-            {/* Category Banner if filtered */}
-            {currentCategory !== 'Home' && (
-              <div className="bg-[#1e3a8a] text-white py-4 px-4 shadow-xs">
-                <div className="max-w-[1240px] mx-auto flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs uppercase font-bold text-[#facc15] tracking-widest">
-                      Navegando na editoria:
-                    </span>
-                    <h2 className="font-condensed font-black text-2xl uppercase tracking-wide">
-                      {currentCategory} {currentSubcategory ? `• ${currentSubcategory}` : ''}
-                    </h2>
-                  </div>
-                  <button
-                    onClick={() => handleSelectCategory('Home')}
-                    className="text-xs font-bold text-blue-200 hover:text-white underline cursor-pointer"
-                  >
-                    Voltar para Todos os Destaques
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Hero Carousel */}
             <HeroCarousel
               articles={heroSlideArticles}
@@ -375,49 +456,51 @@ export default function App() {
               onSelectArticle={handleSelectArticle}
             />
 
-            {/* Últimas Notícias Grid */}
+            {/* Últimas Notícias Grid with in-feed ad */}
             <LatestNewsGrid
-              articles={INITIAL_ARTICLES}
+              articles={articles}
               onSelectArticle={handleSelectArticle}
               selectedFilter={newsFilter}
               onFilterChange={(f) => setNewsFilter(f)}
+              onOpenAdModal={() => setIsAdModalOpen(true)}
             />
 
             {/* Content by Category + Sidebar */}
             <CategoryBlockSection
-              articles={INITIAL_ARTICLES}
+              articles={articles}
               standings={INITIAL_STANDINGS}
-              columnists={PORTAL_COLUMNISTS}
               onSelectArticle={handleSelectArticle}
               onSelectCategory={handleSelectCategory}
               onOpenStandingsModal={() => setIsStandingsOpen(true)}
               onOpenSubscribe={() => setIsSubscribeOpen(true)}
               onShowToast={showToast}
-            />
-
-            {/* Videos Multimidia Section */}
-            <VideosSection
-              onOpenVideo={(v: VideoItem) => {
-                setVideoModalData({ title: v.title, duration: v.duration });
-              }}
-            />
-
-            {/* Editorials of Opinion */}
-            <EditorialsSection
-              onSelectArticle={handleSelectArticle}
-              articles={INITIAL_ARTICLES}
+              onOpenAdModal={() => setIsAdModalOpen(true)}
             />
 
             {/* Newsletter Band */}
             <NewsletterBand onShowToast={showToast} />
           </>
+        ) : currentView === 'category' ? (
+          /* Dedicated Standalone Category Page */
+          <CategoryView
+            category={currentCategory}
+            subcategory={currentSubcategory}
+            articles={articles}
+            standings={INITIAL_STANDINGS}
+            onSelectArticle={handleSelectArticle}
+            onBackToHome={handleBackToHome}
+            onOpenStandingsModal={() => setIsStandingsOpen(true)}
+            onSelectSubcategory={(sub) => setCurrentSubcategory(sub)}
+            onOpenCreateArticle={(cat) => handleOpenCreateArticle(cat)}
+            onOpenAdModal={() => setIsAdModalOpen(true)}
+          />
         ) : (
           /* Full Article Reading Experience */
           <ArticleView
             article={selectedArticle}
-            onBack={handleBackToHome}
+            onBack={handleBackFromArticle}
             onSelectArticle={handleSelectArticle}
-            relatedArticles={INITIAL_ARTICLES.filter(
+            relatedArticles={articles.filter(
               (a) => a.id !== selectedArticle.id && a.category === selectedArticle.category
             )}
             isSaved={savedArticleIds.includes(selectedArticle.id)}
@@ -432,13 +515,14 @@ export default function App() {
         )}
       </main>
 
-      {/* 4. Portal Footer */}
+      {/* 5. Portal Footer */}
       <Footer
         onSelectCategory={handleSelectCategory}
         onOpenInstitutionalModal={(title, content) =>
           setInstitutionalData({ title, content })
         }
         onShowToast={showToast}
+        onOpenWordPressConfig={() => handleOpenCreateArticle()}
       />
 
       {/* Back to Top Floating Button */}
@@ -469,6 +553,22 @@ export default function App() {
       )}
 
       {/* MODALS */}
+      {/* WordPress CMS & Category Sync Modal */}
+      <CreateArticleModal
+        isOpen={isCreateArticleOpen}
+        onClose={() => setIsCreateArticleOpen(false)}
+        onSaveArticle={handleSaveNewArticle}
+        onSyncArticlesBatch={handleSyncWordPressBatch}
+        defaultCategory={createArticleDefaultCat}
+      />
+
+      {/* Media Kit & Ad Spaces Modal */}
+      <AdInfoModal
+        isOpen={isAdModalOpen}
+        onClose={() => setIsAdModalOpen(false)}
+        onShowToast={showToast}
+      />
+
       {/* Google Drive & Firebase Cloud Modal */}
       <GoogleDriveModal
         isOpen={isDriveModalOpen}
@@ -487,7 +587,7 @@ export default function App() {
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-        articles={INITIAL_ARTICLES}
+        articles={articles}
         onSelectArticle={handleSelectArticle}
       />
 

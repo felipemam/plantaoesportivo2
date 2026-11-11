@@ -451,3 +451,34 @@ export function subscribeToUserDriveExports(
     }
   );
 }
+
+export async function saveArticleToFirestore(article: {
+  id: string;
+  title: string;
+  category: string;
+  subcategory?: string;
+  author: { name: string; avatar: string; role?: string };
+  dek: string;
+  paragraphs: string[];
+  publishedAt: string;
+}): Promise<void> {
+  const articleId = sanitizeId(article.id);
+  const path = `articles/${articleId}`;
+
+  try {
+    await setDoc(doc(db, 'articles', articleId), {
+      title: truncateString(article.title, MAX_ARTICLE_TITLE_LENGTH),
+      category: truncateString(article.category, MAX_CATEGORY_LENGTH),
+      subcategory: article.subcategory ? truncateString(article.subcategory, MAX_CATEGORY_LENGTH) : null,
+      authorName: truncateString(article.author.name, MAX_AUTHOR_NAME_LENGTH),
+      authorAvatar: truncateString(article.author.avatar, MAX_AUTHOR_AVATAR_LENGTH),
+      dek: article.dek,
+      paragraphs: article.paragraphs,
+      publishedAt: article.publishedAt,
+      createdAt: serverTimestamp()
+    });
+  } catch (error) {
+    // Graceful offline fallback
+    console.warn('Firestore offline or rules restricted, stored locally:', error);
+  }
+}

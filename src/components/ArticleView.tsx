@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   ArrowLeft,
   Share2,
@@ -10,7 +10,9 @@ import {
   UserPlus,
   UserCheck,
   Type,
-  Cloud
+  Cloud,
+  Clock,
+  BookOpen
 } from 'lucide-react';
 import { User } from 'firebase/auth';
 import { Article } from '../data/portalData';
@@ -19,6 +21,11 @@ import {
   postCommentToCloud,
   subscribeToArticleComments
 } from '../services/firebase';
+import {
+  parseMinutesFromReadTime,
+  calculateScrollPercentage,
+  computeReadingMetrics
+} from '../utils/readingProgress';
 
 interface ArticleViewProps {
   article: Article;
@@ -46,6 +53,8 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
   onOpenDriveModal
 }) => {
   // Reading progress bar calculation
+  const articleContentRef = useRef<HTMLDivElement>(null);
+  const totalMinutes = useMemo(() => parseMinutesFromReadTime(article.readTime), [article.readTime]);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   // Text size state: 'sm' | 'md' | 'lg'
@@ -65,26 +74,50 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
   useEffect(() => {
     setLocalComments(article.initialComments);
+    if (!user) {
+      setCloudComments([]);
+      return;
+    }
     const unsub = subscribeToArticleComments(article.id, (fetched) => {
       setCloudComments(fetched);
     });
     return () => unsub();
-  }, [article.id, article.initialComments]);
+  }, [article.id, article.initialComments, user]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setScrollProgress(0);
 
     const handleScroll = () => {
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (docHeight > 0) {
-        const pct = Math.min(100, Math.max(0, (window.scrollY / docHeight) * 100));
-        setScrollProgress(pct);
+      if (articleContentRef.current) {
+        const rect = articleContentRef.current.getBoundingClientRect();
+        const elementTop = window.scrollY + rect.top;
+        const elementHeight = rect.height;
+        const progress = calculateScrollPercentage(
+          window.scrollY,
+          elementTop,
+          elementHeight,
+          window.innerHeight
+        );
+        setScrollProgress(progress);
+      } else {
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (docHeight > 0) {
+          const pct = Math.min(100, Math.max(0, Math.round((window.scrollY / docHeight) * 100)));
+          setScrollProgress(pct);
+        }
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [article.id]);
+
+  const metrics = useMemo(
+    () => computeReadingMetrics(scrollProgress, totalMinutes),
+    [scrollProgress, totalMinutes]
+  );
 
   const handleShare = (network: string) => {
     const url = encodeURIComponent(window.location.href);
@@ -195,16 +228,64 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
   return (
     <div className="relative pb-16">
-      {/* Top Fixed Reading Progress Indicator */}
+      {/* Top Fixed Reading Progress Indicator with Track and Glow Tip */}
       <div
-        id="readProgress"
-        className="fixed top-0 left-0 h-1 bg-[#dc2626] z-50 transition-all duration-100 ease-out"
-        style={{ width: `${scrollProgress}%` }}
+        id="reading-progress-container"
+        className="fixed top-0 left-0 w-full z-50 pointer-events-none"
         role="progressbar"
-        aria-valuenow={Math.round(scrollProgress)}
+        aria-valuenow={metrics.percentage}
         aria-valuemin={0}
         aria-valuemax={100}
-      />
+        aria-label="Progresso de leitura da matéria"
+      >
+        {/* Full-width background track providing visual depth context */}
+        <div className="w-full h-1.5 bg-slate-200/90 shadow-2xs">
+          <div
+            id="readProgress"
+            className="h-full bg-gradient-to-r from-[#1e3a8a] via-[#dc2626] to-[#facc15] transition-[width] duration-150 ease-out relative"
+            style={{ width: `${metrics.percentage}%` }}
+          >
+            {/* Glowing active reader bead at leading edge */}
+            {metrics.percentage > 0 && metrics.percentage < 100 && (
+              <span
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#facc15] border border-white shadow-sm ring-2 ring-red-500/40"
+                aria-hidden="true"
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Floating Reading Depth Badge / Visual Cue */}
+      {scrollProgress > 2 && (
+        <div
+          className="fixed top-24 right-4 sm:right-8 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border border-gray-200/90 dark:border-gray-800 shadow-lg rounded-full py-1.5 px-3.5 flex items-center gap-2.5 text-xs text-gray-800 dark:text-gray-200 transition-all animate-in fade-in slide-in-from-top-2 duration-200 pointer-events-auto"
+          title={`Progresso: ${metrics.percentage}% • ${metrics.depthLabel}`}
+        >
+          <div className="flex items-center gap-1.5">
+            <span className="font-condensed font-black text-xs px-1.5 py-0.5 rounded bg-[#1e3a8a] text-white tracking-wider">
+              {metrics.percentage}%
+            </span>
+            <span className="hidden sm:inline font-medium text-gray-700 dark:text-gray-300">
+              {metrics.depthLabel}
+            </span>
+          </div>
+          <span className="text-gray-300 dark:text-gray-700 hidden sm:inline">|</span>
+          <span className="text-[11px] font-semibold text-gray-500 flex items-center gap-1">
+            {metrics.isComplete ? (
+              <span className="text-emerald-600 font-bold flex items-center gap-1">
+                <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                Concluído
+              </span>
+            ) : (
+              <>
+                <Clock className="w-3 h-3 text-gray-400" />
+                <span>{metrics.remainingText}</span>
+              </>
+            )}
+          </span>
+        </div>
+      )}
 
       {/* Floating Vertical Share (Desktop on the left edge) */}
       <div className="hidden xl:flex fixed left-6 top-1/2 -translate-y-1/2 flex-col gap-2.5 z-30 bg-white p-2 rounded-xl shadow-lg border border-gray-200">
@@ -302,7 +383,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         </div>
 
         {/* Main Article Container constrained for ideal reading */}
-        <div className="max-w-[820px] mx-auto">
+        <div ref={articleContentRef} className="max-w-[820px] mx-auto">
           {/* Header section */}
           <header className="mb-6">
             <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -315,32 +396,32 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             </div>
 
             {/* Headline */}
-            <h1 className="font-condensed font-black text-3xl sm:text-5xl lg:text-[52px] text-gray-950 uppercase leading-[1.05] tracking-tight mb-4">
+            <h1 className="font-condensed font-black text-3xl sm:text-5xl lg:text-[52px] text-gray-950 dark:text-gray-100 uppercase leading-[1.05] tracking-tight mb-4">
               {article.title}
             </h1>
 
             {/* Dek */}
-            <p className="font-serif-body italic text-gray-700 text-lg sm:text-2xl leading-relaxed mb-6">
+            <p className="font-serif-body italic text-gray-700 dark:text-gray-300 text-lg sm:text-2xl leading-relaxed mb-6">
               {article.dek}
             </p>
 
             {/* Byline bar */}
-            <div className="py-3.5 border-y border-gray-200 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm text-gray-600">
+            <div className="py-3.5 border-y border-gray-200 dark:border-gray-800 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               <div className="flex items-center gap-3">
                 <span className="w-10 h-10 rounded-full bg-[#1e3a8a] text-white font-condensed font-bold text-sm flex items-center justify-center shrink-0 shadow-xs">
                   {article.author.avatar}
                 </span>
                 <div>
-                  <div className="font-bold text-gray-900 leading-tight">
+                  <div className="font-bold text-gray-900 dark:text-gray-100 leading-tight">
                     Por {article.author.name}
                   </div>
-                  <div className="text-gray-500 text-xs">
+                  <div className="text-gray-500 dark:text-gray-400 text-xs">
                     {article.author.role} • {article.publishedAt}
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 text-xs text-gray-500">
+              <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                 <span>{article.readTime}</span>
                 <span>•</span>
                 <span>{article.readCount}</span>
@@ -405,6 +486,36 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   <Bookmark className="w-3.5 h-3.5" fill={isSaved ? 'currentColor' : 'none'} />
                   <span>{isSaved ? 'Salva' : 'Salvar Matéria'}</span>
                 </button>
+              </div>
+            </div>
+
+            {/* Visual Cue for Content Depth & Reading Guide */}
+            <div className="my-5 p-3.5 bg-gradient-to-r from-blue-50/80 via-white to-amber-50/60 rounded-xl border border-gray-200 shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#1e3a8a] text-[#facc15] flex items-center justify-center shrink-0 shadow-xs">
+                  <BookOpen className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <div className="font-condensed font-bold uppercase tracking-wider text-[#1e3a8a] flex items-center gap-2">
+                    <span>Profundidade do Artigo</span>
+                    <span className="text-[10px] font-sans font-semibold text-gray-400">• {article.readTime}</span>
+                  </div>
+                  <div className="text-gray-600 font-medium">
+                    {metrics.depthLabel} ({metrics.percentage}%)
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-gray-500 font-semibold text-[11px] sm:text-xs">
+                  {metrics.remainingText}
+                </span>
+                <div className="w-28 sm:w-40 h-2 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#1e3a8a] via-[#dc2626] to-[#facc15] transition-all duration-200"
+                    style={{ width: `${metrics.percentage}%` }}
+                  />
+                </div>
               </div>
             </div>
           </header>

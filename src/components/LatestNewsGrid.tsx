@@ -1,18 +1,21 @@
 import React from 'react';
 import { Article } from '../data/portalData';
+import { InFeedAd } from './AdBanners';
 
 interface LatestNewsGridProps {
   articles: Article[];
   onSelectArticle: (article: Article) => void;
   selectedFilter: string;
   onFilterChange: (filter: string) => void;
+  onOpenAdModal?: () => void;
 }
 
 export const LatestNewsGrid: React.FC<LatestNewsGridProps> = ({
   articles,
   onSelectArticle,
   selectedFilter,
-  onFilterChange
+  onFilterChange,
+  onOpenAdModal
 }) => {
   const filterCategories = [
     'Todas',
@@ -25,7 +28,7 @@ export const LatestNewsGrid: React.FC<LatestNewsGridProps> = ({
 
   const filtered = selectedFilter === 'Todas'
     ? articles
-    : articles.filter(a => a.category === selectedFilter);
+    : articles.filter(a => a.category.toLowerCase() === selectedFilter.toLowerCase());
 
   const getBadgeClass = (category: string) => {
     switch (category) {
@@ -45,18 +48,18 @@ export const LatestNewsGrid: React.FC<LatestNewsGridProps> = ({
   };
 
   return (
-    <section className="py-8 border-t border-gray-200" aria-labelledby="latest-title">
+    <section className="py-8 border-t border-gray-200 dark:border-gray-800 transition-colors" aria-labelledby="latest-title">
       <div className="max-w-[1240px] mx-auto px-4">
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 pb-3 border-b-2 border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 pb-3 border-b-2 border-gray-200 dark:border-gray-800">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#dc2626] animate-pulse"></span>
-              <h2 id="latest-title" className="font-condensed font-black text-2xl sm:text-3xl text-[#1e3a8a] uppercase tracking-wide">
+              <h2 id="latest-title" className="font-condensed font-black text-2xl sm:text-3xl text-[#1e3a8a] dark:text-[#facc15] uppercase tracking-wide">
                 Últimas Notícias
               </h2>
             </div>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
               Atualizadas em tempo real pela nossa redação esportiva
             </p>
           </div>
@@ -69,8 +72,8 @@ export const LatestNewsGrid: React.FC<LatestNewsGridProps> = ({
                 onClick={() => onFilterChange(cat)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer ${
                   selectedFilter === cat
-                    ? 'bg-[#1e3a8a] text-white shadow-xs'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    ? 'bg-[#1e3a8a] dark:bg-blue-600 text-white shadow-xs'
+                    : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
                 }`}
               >
                 {cat}
@@ -79,13 +82,13 @@ export const LatestNewsGrid: React.FC<LatestNewsGridProps> = ({
           </div>
         </div>
 
-        {/* 3-Column Responsive Grid */}
+        {/* 3-Column Responsive Grid with integrated InFeed Ad */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.slice(0, 6).map((art) => (
+          {filtered.slice(0, 5).map((art) => (
             <article
               key={art.id}
               onClick={() => onSelectArticle(art)}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-200 hover:-translate-y-1 flex flex-col cursor-pointer group"
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-200 hover:-translate-y-1 flex flex-col cursor-pointer group"
             >
               {/* Card Image Banner */}
               <div
@@ -105,30 +108,33 @@ export const LatestNewsGrid: React.FC<LatestNewsGridProps> = ({
 
               {/* Card Body */}
               <div className="p-4 sm:p-5 flex flex-col flex-1">
-                <h3 className="font-condensed font-bold text-xl text-gray-900 group-hover:text-[#1e3a8a] transition-colors uppercase leading-tight line-clamp-2 mb-2">
+                <h3 className="font-condensed font-bold text-xl text-gray-900 dark:text-gray-100 group-hover:text-[#1e3a8a] dark:group-hover:text-[#facc15] transition-colors uppercase leading-tight line-clamp-2 mb-2">
                   {art.title}
                 </h3>
-                <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed mb-4 flex-1">
+                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 leading-relaxed mb-4 flex-1">
                   {art.dek}
                 </p>
 
                 {/* Footer Metadata */}
-                <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+                <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-[#1e3a8a] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
                       {art.author.avatar}
                     </span>
-                    <span className="font-medium text-gray-700 truncate max-w-[110px]">
+                    <span className="font-medium text-gray-700 dark:text-gray-300 truncate max-w-[110px]">
                       {art.author.name}
                     </span>
                   </div>
-                  <div className="text-[11px] text-gray-400">
+                  <div className="text-[11px] text-gray-400 dark:text-gray-400">
                     {art.readCount}
                   </div>
                 </div>
               </div>
             </article>
           ))}
+
+          {/* In-Feed Native Ad Slot right inside the grid */}
+          <InFeedAd onOpenAdModal={onOpenAdModal} />
         </div>
       </div>
     </section>

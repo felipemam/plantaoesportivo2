@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, CheckCircle2, Mail, Users, ArrowUpRight } from 'lucide-react';
-import { StandingsRow, Columnist, Article } from '../data/portalData';
+import { Trophy, CheckCircle2, Mail, Megaphone, ExternalLink } from 'lucide-react';
+import { StandingsRow, Columnist } from '../data/portalData';
 
 interface SidebarWidgetsProps {
   standings: StandingsRow[];
-  columnists: Columnist[];
+  columnists?: Columnist[];
   onOpenStandingsModal: () => void;
   onOpenSubscribe: () => void;
   onSelectArticleById: (articleId: string) => void;
   onShowToast: (message: string, type?: 'success' | 'error') => void;
+  onOpenAdModal?: () => void;
 }
 
 interface PollOption {
@@ -18,11 +19,10 @@ interface PollOption {
 
 export const SidebarWidgets: React.FC<SidebarWidgetsProps> = ({
   standings,
-  columnists,
   onOpenStandingsModal,
   onOpenSubscribe,
-  onSelectArticleById,
-  onShowToast
+  onShowToast,
+  onOpenAdModal
 }) => {
   // Poll state with localStorage persistence
   const [pollOptions, setPollOptions] = useState<PollOption[]>([
@@ -44,7 +44,7 @@ export const SidebarWidgets: React.FC<SidebarWidgetsProps> = ({
         setHasVoted(true);
         setSelectedPollIndex(parseInt(savedVote, 10));
       }
-    } catch (e) {
+    } catch {
       // Ignore localStorage unavailable
     }
   }, []);
@@ -62,7 +62,7 @@ export const SidebarWidgets: React.FC<SidebarWidgetsProps> = ({
 
     try {
       localStorage.setItem('plantao_poll_vote', index.toString());
-    } catch (e) {
+    } catch {
       // Ignore
     }
 
@@ -80,114 +80,95 @@ export const SidebarWidgets: React.FC<SidebarWidgetsProps> = ({
   };
 
   return (
-    <aside className="space-y-6" aria-label="Barra lateral informativa">
-      {/* 1. Ranking do Brasileirão */}
-      <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-xs">
-        <div className="flex items-center justify-between mb-1">
-          <h3 className="font-condensed font-black text-xl text-[#1e3a8a] uppercase flex items-center gap-1.5">
+    <aside className="space-y-6">
+      {/* 1. Mini Tabela do Brasileirão */}
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-xs transition-colors">
+        <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-[#facc15]" />
-            Ranking Brasileirão
-          </h3>
-          <span className="text-[11px] font-bold text-gray-400 uppercase">Série A</span>
+            <h3 className="font-condensed font-black text-xl text-[#1e3a8a] dark:text-[#facc15] uppercase tracking-wide">
+              Brasileirão Série A
+            </h3>
+          </div>
+          <span className="text-[11px] font-bold text-gray-400 uppercase">2026</span>
         </div>
-        <p className="text-xs text-gray-500 mb-3">Classificação atualizada • Pontos corridos</p>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm border-collapse">
-            <thead>
-              <tr className="border-b border-gray-200 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                <th className="py-1.5 w-7 text-center">#</th>
-                <th className="py-1.5">Time</th>
-                <th className="py-1.5 text-center text-xs">J</th>
-                <th className="py-1.5 text-right font-black text-xs">Pts</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 font-medium">
-              {standings.slice(0, 5).map((row) => (
-                <tr key={row.team} className="hover:bg-blue-50/40 transition-colors">
-                  <td className="py-2.5 text-center">
-                    <span
-                      className={`w-5 h-5 rounded-full inline-flex items-center justify-center text-xs font-bold ${
-                        row.position === 1
-                          ? 'bg-[#facc15] text-gray-950 shadow-xs'
-                          : row.position <= 4
-                          ? 'bg-blue-100 text-[#1e3a8a]'
-                          : 'bg-gray-100 text-gray-700'
-                      }`}
-                    >
-                      {row.position}
-                    </span>
-                  </td>
-                  <td className="py-2.5 font-semibold text-gray-900 flex items-center gap-2">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full shrink-0"
-                      style={{ backgroundColor: row.crestColor }}
-                    />
-                    <span className="truncate">{row.team}</span>
-                  </td>
-                  <td className="py-2.5 text-center text-xs text-gray-500 font-normal">
-                    {row.played}
-                  </td>
-                  <td className="py-2.5 text-right font-condensed font-black text-base text-[#1e3a8a] tabular-nums">
-                    {row.points}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-2 mb-4">
+          <div className="grid grid-cols-[24px_1fr_40px_40px] text-[11px] font-bold text-gray-400 dark:text-gray-400 uppercase px-2">
+            <span>#</span>
+            <span>Clube</span>
+            <span className="text-center">J</span>
+            <span className="text-right">PTS</span>
+          </div>
+
+          {standings.slice(0, 5).map((row) => (
+            <div
+              key={row.position}
+              className="grid grid-cols-[24px_1fr_40px_40px] items-center text-xs py-1.5 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/80 transition-colors"
+            >
+              <span
+                className={`w-5 h-5 rounded-full inline-flex items-center justify-center font-bold text-[11px] ${
+                  row.position === 1
+                    ? 'bg-[#facc15] text-gray-950 font-black'
+                    : row.position <= 4
+                    ? 'bg-blue-100 dark:bg-blue-950 text-[#1e3a8a] dark:text-blue-300 font-bold'
+                    : 'text-gray-500 dark:text-gray-400'
+                }`}
+              >
+                {row.position}
+              </span>
+              <span className="font-semibold text-gray-900 dark:text-gray-100 truncate pr-2">
+                {row.team}
+              </span>
+              <span className="text-center text-gray-500 dark:text-gray-400 font-mono text-[11px]">
+                {row.played}
+              </span>
+              <span className="text-right font-condensed font-black text-sm text-[#1e3a8a] dark:text-blue-400">
+                {row.points}
+              </span>
+            </div>
+          ))}
         </div>
 
         <button
           onClick={onOpenStandingsModal}
-          className="mt-3.5 w-full py-2 text-xs font-bold text-[#1e3a8a] hover:text-[#dc2626] bg-blue-50/80 hover:bg-blue-100/80 rounded-lg transition-colors cursor-pointer uppercase tracking-wider flex items-center justify-center gap-1"
+          className="w-full py-2 bg-gray-100 dark:bg-gray-800 hover:bg-[#1e3a8a] hover:text-white dark:hover:bg-blue-600 text-gray-700 dark:text-gray-200 font-condensed font-bold text-xs uppercase rounded-lg transition-colors cursor-pointer"
         >
-          <span>Ver Tabela Completa</span>
-          <ArrowUpRight className="w-3.5 h-3.5" />
+          Ver Classificação Completa
         </button>
       </div>
 
-      {/* 2. Enquete Interativa */}
-      <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-xs">
-        <div className="flex items-center justify-between mb-1">
-          <h3 className="font-condensed font-black text-xl text-[#1e3a8a] uppercase">
-            Enquete do Leitor
-          </h3>
-          <span className="text-[10px] font-bold text-[#dc2626] uppercase bg-red-50 px-2 py-0.5 rounded">
-            Interativo
-          </span>
+      {/* 2. Enquete do Leitor */}
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-xs transition-colors">
+        <div className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-red-100 dark:bg-red-950/60 text-[#dc2626] dark:text-red-400 mb-2">
+          Enquete Plantão
         </div>
-        <p className="text-xs text-gray-500 mb-3">Participe com o seu voto</p>
-
-        <p className="font-semibold text-sm text-gray-900 mb-3 leading-snug">
-          Quem leva o título do Brasileirão 2026?
-        </p>
+        <h3 className="font-condensed font-bold text-lg text-gray-900 dark:text-gray-100 uppercase leading-snug mb-3">
+          Quem leva o título do Campeonato Brasileiro nesta temporada?
+        </h3>
 
         <div className="space-y-2">
           {pollOptions.map((opt, idx) => {
-            const pct = Math.round((opt.votes / (totalVotes || 1)) * 100);
+            const percent = totalVotes > 0 ? Math.round((opt.votes / totalVotes) * 100) : 0;
             const isSelected = selectedPollIndex === idx;
 
             if (hasVoted) {
               return (
-                <div
-                  key={opt.label}
-                  className={`relative p-2.5 border rounded-lg overflow-hidden transition-all text-xs font-semibold ${
-                    isSelected
-                      ? 'border-[#1e3a8a] bg-blue-50/60'
-                      : 'border-gray-200 bg-gray-50/40'
-                  }`}
-                >
-                  {/* Animated Percentage Fill Bar */}
+                <div key={opt.label} className="relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 p-2 text-xs">
                   <div
-                    className="absolute left-0 top-0 bottom-0 bg-blue-200/50 transition-all duration-700 ease-out z-0"
-                    style={{ width: `${pct}%` }}
+                    className={`absolute inset-y-0 left-0 transition-all duration-500 ${
+                      isSelected
+                        ? 'bg-blue-100 dark:bg-blue-950/70 border-r-2 border-[#1e3a8a]'
+                        : 'bg-gray-100 dark:bg-gray-800'
+                    }`}
+                    style={{ width: `${percent}%` }}
                   />
-                  <div className="relative z-10 flex items-center justify-between">
-                    <span className="flex items-center gap-1.5 text-gray-900">
-                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#1e3a8a]" />}
+                  <div className="relative flex items-center justify-between font-medium">
+                    <span className="flex items-center gap-1.5 text-gray-900 dark:text-gray-100">
+                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#1e3a8a] dark:text-blue-400 inline" />}
                       {opt.label}
                     </span>
-                    <span className="font-bold text-[#1e3a8a] tabular-nums">{pct}%</span>
+                    <span className="font-bold text-gray-700 dark:text-gray-300">{percent}%</span>
                   </div>
                 </div>
               );
@@ -197,7 +178,7 @@ export const SidebarWidgets: React.FC<SidebarWidgetsProps> = ({
               <button
                 key={opt.label}
                 onClick={() => handleVote(idx)}
-                className="w-full text-left p-2.5 border border-gray-200 hover:border-[#1e3a8a] hover:bg-blue-50/40 rounded-lg text-xs font-semibold text-gray-800 transition-colors cursor-pointer flex items-center justify-between"
+                className="w-full text-left p-2.5 border border-gray-200 dark:border-gray-800 hover:border-[#1e3a8a] dark:hover:border-blue-500 hover:bg-blue-50/40 dark:hover:bg-gray-800/80 rounded-lg text-xs font-semibold text-gray-800 dark:text-gray-200 transition-colors cursor-pointer flex items-center justify-between"
               >
                 <span>{opt.label}</span>
                 <span className="text-[11px] text-gray-400 font-normal">Votar</span>
@@ -211,15 +192,58 @@ export const SidebarWidgets: React.FC<SidebarWidgetsProps> = ({
         </div>
       </div>
 
-      {/* 3. Newsletter Express */}
-      <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-xs">
+      {/* 3. Espaço Publicitário Lateral (Half Page / MPU 300x250) */}
+      <div className="relative rounded-xl border border-gray-300 dark:border-gray-700/80 bg-gradient-to-br from-[#1e3a8a] to-[#0f172a] text-white p-5 shadow-md overflow-hidden text-center">
+        <div className="flex items-center justify-between text-[10px] uppercase font-bold tracking-widest text-[#facc15] mb-2 border-b border-blue-800/60 pb-1.5">
+          <span className="flex items-center gap-1">
+            <Megaphone className="w-3 h-3 text-[#facc15]" />
+            Publicidade • 300x250
+          </span>
+          {onOpenAdModal && (
+            <button
+              onClick={onOpenAdModal}
+              className="hover:underline flex items-center gap-0.5 text-blue-200 cursor-pointer"
+            >
+              <span>Mídia Kit</span>
+              <ExternalLink className="w-2.5 h-2.5" />
+            </button>
+          )}
+        </div>
+        <div className="font-condensed font-black text-2xl uppercase tracking-wide leading-none my-2 text-white">
+          Temporada Esportiva 2026
+        </div>
+        <p className="text-xs text-blue-100 max-w-[240px] mx-auto mb-4">
+          Divulgue seu produto ou evento para o público mais engajado do esporte brasileiro.
+        </p>
+        <div className="flex items-center justify-center gap-2">
+          {onOpenAdModal ? (
+            <button
+              onClick={onOpenAdModal}
+              className="bg-[#facc15] hover:bg-[#eab308] text-gray-950 font-condensed font-black text-xs uppercase px-4 py-2 rounded-lg shadow-sm hover:scale-105 transition-all cursor-pointer inline-flex items-center gap-1"
+            >
+              <span>Anuncie Aqui</span>
+              <ExternalLink className="w-3 h-3" />
+            </button>
+          ) : (
+            <button
+              onClick={onOpenSubscribe}
+              className="bg-[#facc15] hover:bg-[#eab308] text-gray-950 font-condensed font-black text-xs uppercase px-4 py-2 rounded-lg shadow-sm hover:scale-105 transition-all cursor-pointer"
+            >
+              Conhecer Planos
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* 4. Newsletter Express */}
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-xs transition-colors">
         <div className="flex items-center gap-2 mb-1">
           <Mail className="w-5 h-5 text-[#dc2626]" />
-          <h3 className="font-condensed font-black text-xl text-[#1e3a8a] uppercase">
-            Newsletter
+          <h3 className="font-condensed font-black text-xl text-[#1e3a8a] dark:text-[#facc15] uppercase">
+            Boletim Matinal
           </h3>
         </div>
-        <p className="text-xs text-gray-500 mb-3">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
           Receba o resumo diário do esporte toda manhã no seu e-mail.
         </p>
 
@@ -229,77 +253,17 @@ export const SidebarWidgets: React.FC<SidebarWidgetsProps> = ({
             value={sideEmail}
             onChange={(e) => setSideEmail(e.target.value)}
             placeholder="seu@email.com.br"
-            className="w-full h-10 px-3 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] focus:bg-white"
+            className="w-full h-10 px-3 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] dark:focus:ring-blue-500 text-gray-900 dark:text-gray-100"
             required
           />
           <button
             type="submit"
-            className="w-full h-10 bg-[#1e3a8a] hover:bg-[#172554] text-white font-condensed font-bold text-sm uppercase rounded-lg tracking-wider transition-colors cursor-pointer"
+            className="w-full h-10 bg-[#1e3a8a] dark:bg-blue-600 hover:bg-[#172554] dark:hover:bg-blue-700 text-white font-condensed font-bold text-sm uppercase rounded-lg tracking-wider transition-colors cursor-pointer"
           >
             Quero Receber
           </button>
         </form>
         <p className="text-[10px] text-gray-400 mt-2">Sem spam. Cancele quando quiser com 1 clique.</p>
-      </div>
-
-      {/* 4. Colunistas do Plantão */}
-      <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-xs">
-        <div className="flex items-center gap-2 mb-1">
-          <Users className="w-5 h-5 text-[#1e3a8a]" />
-          <h3 className="font-condensed font-black text-xl text-[#1e3a8a] uppercase">
-            Colunistas
-          </h3>
-        </div>
-        <p className="text-xs text-gray-500 mb-3.5">
-          Opinião de quem vive e apura o esporte de perto
-        </p>
-
-        <div className="space-y-3">
-          {columnists.map((col) => (
-            <div
-              key={col.id}
-              onClick={() => onSelectArticleById(col.latestArticleId)}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group"
-            >
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-condensed font-black text-sm shrink-0 shadow-xs"
-                style={{ background: col.gradient }}
-              >
-                {col.avatar}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-sm text-gray-900 group-hover:text-[#1e3a8a] transition-colors truncate">
-                  {col.name}
-                </div>
-                <div className="text-xs text-gray-500 flex items-center gap-1.5">
-                  <span className="font-medium text-blue-900">{col.beat}</span>
-                  <span>•</span>
-                  <span>{col.region}</span>
-                </div>
-              </div>
-              <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-[#1e3a8a] group-hover:translate-x-0.5 transition-all" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 5. Banner Promocional 300x250 */}
-      <div className="relative rounded-xl overflow-hidden p-6 text-white text-center shadow-md bg-gradient-to-br from-[#dc2626] to-[#991b1b] min-h-[220px] flex flex-col items-center justify-center">
-        <div className="text-[10px] uppercase font-bold tracking-widest text-[#facc15] mb-1">
-          Publicidade
-        </div>
-        <div className="font-condensed font-black text-2xl uppercase tracking-wide leading-none mb-2">
-          Temporada 2026
-        </div>
-        <p className="text-xs text-white/90 max-w-[240px] mb-4">
-          Assinantes têm acesso ilimitado às transmissões em vídeo, colunas exclusivas e sem anúncios.
-        </p>
-        <button
-          onClick={onOpenSubscribe}
-          className="bg-[#facc15] hover:bg-[#eab308] text-gray-950 font-condensed font-black text-sm uppercase px-5 py-2.5 rounded-lg shadow-sm hover:scale-105 transition-all cursor-pointer"
-        >
-          Conhecer Planos
-        </button>
       </div>
     </aside>
   );
