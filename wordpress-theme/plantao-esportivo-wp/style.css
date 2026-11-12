@@ -1,0 +1,13 @@
+/*
+Theme Name: Plantão Esportivo WP
+Theme URI: https://github.com/felipemam/plantaoesportivo2
+Author: Plantão Esportivo
+Description: Tema editorial WordPress baseado no projeto React Plantão Esportivo 2; publicações e menus nativos.
+Version: 0.2.1
+Requires at least: 6.4
+Requires PHP: 7.4
+Text Domain: plantao-esportivo-wp
+License: GPL-2.0-or-later
+*/
+
+/* Os estilos visuais ficam em assets/css/site.css e são carregados por functions.php. */

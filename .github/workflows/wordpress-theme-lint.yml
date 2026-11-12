@@ -1,0 +1,26 @@
+name: WordPress theme PHP syntax
+on:
+  pull_request:
+    paths:
+      - 'wordpress-theme/**'
+      - '.github/workflows/wordpress-theme-lint.yml'
+  push:
+    paths:
+      - 'wordpress-theme/**'
+      - '.github/workflows/wordpress-theme-lint.yml'
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check PHP syntax
+        run: |
+          set -e
+          find wordpress-theme/plantao-esportivo-wp -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Check required theme files
+        run: |
+          test -f wordpress-theme/plantao-esportivo-wp/style.css
+          test -f wordpress-theme/plantao-esportivo-wp/index.php
+          test -f wordpress-theme/plantao-esportivo-wp/functions.php
+          test -f wordpress-theme/plantao-esportivo-wp/assets/css/site.css
